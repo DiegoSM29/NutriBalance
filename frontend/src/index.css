@@ -1,1 +1,6 @@
 @import "tailwindcss";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
