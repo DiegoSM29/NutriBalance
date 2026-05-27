@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { registerCliente } from '../services/api';
 
 const inputClass = "w-full px-4 py-3 ps-11 rounded-xl border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-sm";
@@ -32,6 +33,7 @@ export default function Register() {
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState('');
     const [success, setSuccess] = useState('');
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -64,6 +66,7 @@ export default function Register() {
             });
             setSuccess(result.message || 'Registro exitoso.');
             setForm(initialForm);
+            setTimeout(() => navigate('/login'), 1500);
         } catch (err) {
             if (err.errors) {
                 const fieldErrors = {};
@@ -138,7 +141,7 @@ export default function Register() {
                                 </label>
                                 <div className="relative">
                                     <i className={`${iconClass} bi bi-person-badge`}></i>
-                                    <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Juan" className={inputClass} />
+                                    <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Alain" className={inputClass} />
                                 </div>
                                 {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
                             </div>
@@ -148,7 +151,7 @@ export default function Register() {
                                 </label>
                                 <div className="relative">
                                     <i className={`${iconClass} bi bi-person-badge`}></i>
-                                    <input name="apellido" value={form.apellido} onChange={handleChange} placeholder="Pérez" className={inputClass} />
+                                    <input name="apellido" value={form.apellido} onChange={handleChange} placeholder="Vallejos" className={inputClass} />
                                 </div>
                                 {errors.apellido && <p className="text-red-500 text-xs mt-1">{errors.apellido}</p>}
                             </div>
