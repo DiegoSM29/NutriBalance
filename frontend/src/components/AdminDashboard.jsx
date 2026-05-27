@@ -6,17 +6,25 @@ export default function AdminDashboard() {
     const navigate = useNavigate();
     const adminActual = JSON.parse(localStorage.getItem('user'));
 
+    // --- ESTADOS: Todos agrupados al inicio ---
     const [usuarios, setUsuarios] = useState([]);
     const [busqueda, setBuscar] = useState('');
     const [filtroRol, setFiltroRol] = useState('');
     const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
+    const [showPassword, setShowPassword] = useState(false);
     
-    // Estado para el formulario de nuevo empleado
-    const [form, setForm] = useState({ nombre: '', apellido: '', correo: '', password: '', rol: 'ventas' });
+    const [form, setForm] = useState({ 
+        nombre: '', 
+        apellido: '', 
+        correo: '', 
+        password: '', 
+        password_confirmation: '', 
+        rol: 'ventas' 
+    });
 
     useEffect(() => {
         if (!adminActual || adminActual.rol !== 'admin') {
-            navigate('/login'); // Proteger la ruta
+            navigate('/login');
         } else {
             cargarUsuarios();
         }
@@ -24,6 +32,7 @@ export default function AdminDashboard() {
 
     const cargarUsuarios = async () => {
         try {
+            // Nota: Aquí se envía el filtroRol vacío si se selecciona "Todos los roles"
             const res = await getUsuarios({ buscar: busqueda, rol: filtroRol });
             if (res.success) setUsuarios(res.data);
         } catch (error) {
@@ -33,13 +42,25 @@ export default function AdminDashboard() {
 
     const handleCrearEmpleado = async (e) => {
         e.preventDefault();
+
+        if (form.password !== form.password_confirmation) {
+            setMensaje({ tipo: 'error', texto: '¡Las contraseñas no coinciden!' });
+            return;
+        }
+
         try {
             const res = await crearUsuario(form);
             setMensaje({ tipo: 'success', texto: res.message });
-            setForm({ nombre: '', apellido: '', correo: '', password: '', rol: 'ventas' });
+            setForm({ nombre: '', apellido: '', correo: '', password: '', password_confirmation: '', rol: 'ventas' });
             cargarUsuarios();
         } catch (err) {
-            setMensaje({ tipo: 'error', texto: 'Error al crear empleado. Revisa los datos.' });
+            let errorTexto = 'Error al crear empleado. Revisa los datos.';
+            if (err.errors) {
+                errorTexto = Object.values(err.errors)[0][0];
+            } else if (err.message) {
+                errorTexto = err.message;
+            }
+            setMensaje({ tipo: 'error', texto: errorTexto });
         }
     };
 
@@ -56,7 +77,6 @@ export default function AdminDashboard() {
     return (
         <div className="min-h-screen bg-gray-50 p-8">
             <div className="max-w-7xl mx-auto">
-                
                 <header className="mb-8 flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-800">Panel de Administración</h1>
@@ -83,7 +103,30 @@ export default function AdminDashboard() {
                             <input type="text" placeholder="Nombre" required className="w-full p-2 border rounded text-sm" value={form.nombre} onChange={(e) => setForm({...form, nombre: e.target.value})} />
                             <input type="text" placeholder="Apellido" required className="w-full p-2 border rounded text-sm" value={form.apellido} onChange={(e) => setForm({...form, apellido: e.target.value})} />
                             <input type="email" placeholder="Correo" required className="w-full p-2 border rounded text-sm" value={form.correo} onChange={(e) => setForm({...form, correo: e.target.value})} />
-                            <input type="password" placeholder="Contraseña" required className="w-full p-2 border rounded text-sm" value={form.password} onChange={(e) => setForm({...form, password: e.target.value})} />
+                            
+                            <div className="relative">
+                                <input 
+                                    type={showPassword ? "text" : "password"} 
+                                    placeholder="Contraseña" 
+                                    required 
+                                    className="w-full p-2 border rounded text-sm pr-10" 
+                                    value={form.password} 
+                                    onChange={(e) => setForm({...form, password: e.target.value})} 
+                                />
+                                <button type="button" className="absolute right-3 top-2.5 text-gray-500" onClick={() => setShowPassword(!showPassword)}>
+                                    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                                </button>
+                            </div>
+
+                            <input 
+                                type={showPassword ? "text" : "password"} 
+                                placeholder="Confirmar contraseña" 
+                                required 
+                                className="w-full p-2 border rounded text-sm" 
+                                value={form.password_confirmation} 
+                                onChange={(e) => setForm({...form, password_confirmation: e.target.value})} 
+                            />
+
                             <select className="w-full p-2 border rounded text-sm bg-white" value={form.rol} onChange={(e) => setForm({...form, rol: e.target.value})}>
                                 <option value="admin">Administrador</option>
                                 <option value="ventas">Ventas</option>
@@ -91,6 +134,7 @@ export default function AdminDashboard() {
                                 <option value="produccion">Producción</option>
                                 <option value="logistica">Logística</option>
                             </select>
+                            
                             <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded transition-colors text-sm">
                                 Crear Empleado
                             </button>
@@ -110,7 +154,6 @@ export default function AdminDashboard() {
                                     <option value="inventario">Inventario</option>
                                     <option value="produccion">Producción</option>
                                     <option value="logistica">Logística</option>
-                                    <option value="cliente">Cliente</option>
                                 </select>
                             </div>
                         </div>
@@ -139,7 +182,6 @@ export default function AdminDashboard() {
                                                 </span>
                                             </td>
                                             <td className="p-3 text-center">
-                                                {/* HU4 Criterio: Un admin no puede deshabilitarse a sí mismo [cite: 544] */}
                                                 {u.id_usuario !== adminActual.id_usuario && (
                                                     <button 
                                                         onClick={() => handleCambiarEstado(u)}
@@ -151,14 +193,10 @@ export default function AdminDashboard() {
                                             </td>
                                         </tr>
                                     ))}
-                                    {usuarios.length === 0 && (
-                                        <tr><td colSpan="4" className="p-4 text-center text-gray-500 text-sm">No se encontraron usuarios.</td></tr>
-                                    )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
