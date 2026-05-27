@@ -235,7 +235,7 @@ export default function Register() {
 
                         <p className="text-center text-gray-400 text-xs mt-4">
                             ¿Ya tienes cuenta?{' '}
-                            <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
+                            <a href="login" className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
                                 Inicia sesión
                             </a>
                         </p>
