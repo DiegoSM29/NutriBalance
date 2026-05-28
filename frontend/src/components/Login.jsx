@@ -76,22 +76,11 @@ export default function Login() {
       );
 
       const role = result.data.usuario.rol;
+      const destino = role === 'admin' ? '/admin' :
+                      role === 'cliente' ? '/client' :
+                      '/perfil';
 
-      if (role === 'admin') {
-        navigate('/admin');
-      } else if (role === 'ventas') {
-        navigate('/ventas');
-      } else if (role === 'inventario') {
-        navigate('/inventario');
-      } else if (role === 'produccion') {
-        navigate('/produccion');
-      } else if (role === 'cliente') {
-        navigate('/client');
-      } else if (role === 'logistica') {
-        navigate('/logistica');
-      } else {
-        navigate('/');
-      }
+      navigate(destino);
 
     } catch (err) {
       setServerError(
