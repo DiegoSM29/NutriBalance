@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getCatalogo, crearPedido } from '../services/api';
 
+const API_URL = 'http://localhost:8000';
+
 export default function ClienteDashboard() {
     const user = JSON.parse(localStorage.getItem('user'));
 
@@ -121,6 +123,19 @@ export default function ClienteDashboard() {
                         productos.map(producto => (
                             <div key={producto.id_producto} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition-shadow">
                                 <div>
+                                    {producto.imagen ? (
+                                        <div className="w-full h-36 rounded-lg overflow-hidden mb-3 bg-gray-100">
+                                            <img
+                                                src={`${API_URL}/${producto.imagen}`}
+                                                alt={producto.nombre}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="w-full h-36 rounded-lg mb-3 bg-gray-100 flex items-center justify-center">
+                                            <i className="bi bi-image text-gray-400 text-3xl"></i>
+                                        </div>
+                                    )}
                                     <h3 className="font-semibold text-gray-800 text-lg">{producto.nombre}</h3>
                                     <p className="text-xs text-gray-400 mt-1">{producto.categoria} - {producto.tipo_producto}</p>
                                     <p className="text-emerald-600 font-bold text-lg mt-3">Bs {Number(producto.precio_venta).toFixed(2)}</p>
