@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const menuItems = {
     admin: [
         { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
-        { label: 'Panel Admin', path: '/admin', icon: 'bi-shield-lock' },
+        { label: 'Usuarios', path: '/admin', icon: 'bi-people' },
+        { label: 'Productos', path: '/productos', icon: 'bi-box-seam' },
     ],
     ventas: [
         { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
@@ -11,7 +12,7 @@ const menuItems = {
     ],
     inventario: [
         { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
-        { label: 'Inventario', path: '/inventario', icon: 'bi-box-seam' },
+        { label: 'Productos', path: '/productos', icon: 'bi-box-seam' },
     ],
     produccion: [
         { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
@@ -23,7 +24,7 @@ const menuItems = {
     ],
     cliente: [
         { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
-        { label: 'Mi Panel', path: '/client', icon: 'bi-grid' },
+        { label: 'Mi Tienda', path: '/client', icon: 'bi-shop' },
     ],
 };
 

@@ -106,3 +106,77 @@ export async function actualizarUsuario(id, data) {
     if (!response.ok) throw json;
     return json;
 }
+
+// Obtener productos disponibles en el catalogo
+export async function getCatalogo() {
+    const response = await fetch(`${API_URL}/catalogo`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+// Enviar el carrito para crear un pedido nuevo
+export async function crearPedido(data) {
+    // Obtenemos el cliente actual para enviar su ID en los headers
+    const clienteActual = JSON.parse(localStorage.getItem('user'));
+    
+    const response = await fetch(`${API_URL}/pedidos`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': clienteActual.id_usuario // Enviamos el ID del cliente para validacion
+        },
+        body: JSON.stringify(data),
+    });
+    
+    const json = await response.json();
+    if (!response.ok) throw json;
+    
+    return json;
+}
+
+// GESTION DE PRODUCTOS (ADMIN/INVENTARIO)
+export async function getAdminProductos() {
+    const response = await fetch(`${API_URL}/admin/productos`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function crearAdminProducto(formData) {
+    // Al enviar FormData, NO debes poner el header 'Content-Type'
+    const response = await fetch(`${API_URL}/admin/productos`, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: formData,
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function actualizarAdminProducto(id, formData) {
+    // Laravel requiere este "truco" para recibir archivos en una actualizacion (PUT)
+    formData.append('_method', 'PUT'); 
+    const response = await fetch(`${API_URL}/admin/productos/${id}`, {
+        method: 'POST', // Se envía como POST por culpa de los archivos
+        headers: { 'Accept': 'application/json' },
+        body: formData,
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function eliminarAdminProducto(id) {
+    const response = await fetch(`${API_URL}/admin/productos/${id}`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' },
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
