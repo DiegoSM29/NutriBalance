@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerCliente } from '../services/api';
+import fondoVideo from '../assets/Fondo1.mp4';
 
 const inputClass = "w-full px-4 py-3 ps-11 rounded-xl border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-sm";
 const iconClass = "absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg";
@@ -83,8 +84,15 @@ export default function Register() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 flex items-center justify-center p-4">
-            <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl shadow-gray-300/50 overflow-hidden flex flex-col md:flex-row">
+        <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+
+            <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
+                <source src={fondoVideo} type="video/mp4" />
+            </video>
+
+            <div className="absolute inset-0 bg-black/50"></div>
+
+            <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl shadow-gray-300/50 overflow-hidden flex flex-col md:flex-row z-10">
                 <div className="md:w-5/12 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 p-8 md:p-10 flex flex-col justify-between text-white">
                     <div>
                         <div className="flex items-center gap-3 mb-8">
