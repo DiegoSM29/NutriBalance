@@ -79,6 +79,16 @@ class ProfileController extends Controller
         $user->ultima_actualizacion = now();
         $user->save();
 
+        if ($user->rol === 'cliente' && $user->cliente) {
+            if ($request->has('telefono')) {
+                $user->cliente->telefono = $request->telefono;
+            }
+            if ($request->has('direccion')) {
+                $user->cliente->direccion = $request->direccion;
+            }
+            $user->cliente->save();
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Perfil actualizado correctamente.',
@@ -90,6 +100,8 @@ class ProfileController extends Controller
                 'rol'                 => $user->rol,
                 'foto'                => $user->foto,
                 'ultima_actualizacion' => $user->ultima_actualizacion,
+                'telefono'            => $user->cliente?->telefono,
+                'direccion'           => $user->cliente?->direccion,
             ]
         ]);
     }

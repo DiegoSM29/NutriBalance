@@ -8,10 +8,14 @@ export default function Profile() {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
 
+    const esCliente = user?.rol === 'cliente';
+
     const [form, setForm] = useState({
         nombre: '',
         apellido: '',
         correo: '',
+        telefono: '',
+        direccion: '',
         password: '',
         password_confirmation: '',
         current_password: '',
@@ -44,6 +48,8 @@ export default function Profile() {
                     nombre: u.nombre || '',
                     apellido: u.apellido || '',
                     correo: u.correo || '',
+                    telefono: u.cliente?.telefono || '',
+                    direccion: u.cliente?.direccion || '',
                     password: '',
                     password_confirmation: '',
                     current_password: '',
@@ -120,6 +126,10 @@ export default function Profile() {
                 nombre: form.nombre,
                 apellido: form.apellido,
             };
+            if (esCliente) {
+                payload.telefono = form.telefono;
+                payload.direccion = form.direccion;
+            }
             if (form.password) {
                 payload.password = form.password;
                 payload.password_confirmation = form.password_confirmation;
@@ -134,6 +144,10 @@ export default function Profile() {
                     apellido: res.data.apellido,
                     foto: res.data.foto,
                 };
+                if (esCliente) {
+                    updatedUser.telefono = res.data.telefono;
+                    updatedUser.direccion = res.data.direccion;
+                }
                 localStorage.setItem('user', JSON.stringify(updatedUser));
                 setUltimaActualizacion(res.data.ultima_actualizacion);
                 setForm({ ...form, password: '', password_confirmation: '', current_password: '' });
@@ -243,6 +257,35 @@ export default function Profile() {
                         </div>
                         <p className="text-xs text-gray-400 mt-1">El correo no se puede modificar.</p>
                     </div>
+
+                    {esCliente && (
+                        <>
+                            <hr className="border-gray-100" />
+                            <h3 className="text-md font-semibold text-gray-700">Información de contacto</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                                        <i className="bi bi-telephone me-1.5"></i>Teléfono
+                                    </label>
+                                    <div className="relative">
+                                        <i className={`${iconClass} bi bi-phone`}></i>
+                                        <input name="telefono" value={form.telefono} onChange={handleChange} placeholder="+591 71234567" maxLength="16" className={inputClass} />
+                                    </div>
+                                    {errors.telefono && <p className="text-red-500 text-xs mt-1">{errors.telefono}</p>}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                                        <i className="bi bi-geo-alt me-1.5"></i>Dirección
+                                    </label>
+                                    <div className="relative">
+                                        <i className={`${iconClass} bi bi-house-door`}></i>
+                                        <input name="direccion" value={form.direccion} onChange={handleChange} placeholder="Av. Siempre Viva 123" className={inputClass} />
+                                    </div>
+                                    {errors.direccion && <p className="text-red-500 text-xs mt-1">{errors.direccion}</p>}
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     <hr className="border-gray-100" />
 
