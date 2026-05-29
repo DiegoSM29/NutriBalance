@@ -6,6 +6,10 @@ import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
 import ProductPage from './pages/ProductPage';
 import DashboardLayout from './components/DashboardLayout';
+import ProductDashboard from './components/ProductDashboard';
+import Ventas from './components/Ventas';
+import ProtectedRouteVentas from './components/ProtectedRouteVentas';
+
 
 function App() {
     return (
@@ -20,6 +24,14 @@ function App() {
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/productos" element={<ProductPage />} />
             </Route>
+            <Route
+                path="/ventas"
+                element={
+                    <ProtectedRouteVentas>
+                        <Ventas />
+                    </ProtectedRouteVentas>
+                }
+            />
         </Routes>
     );
 }

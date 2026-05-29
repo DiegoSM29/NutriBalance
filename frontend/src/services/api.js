@@ -180,3 +180,35 @@ export async function eliminarAdminProducto(id) {
     if (!response.ok) throw json;
     return json;
 }
+
+export async function getProductos() {
+
+    const response = await fetch(`${API_URL}/productos/disponibles`);
+
+    const json = await response.json();
+
+    if (!response.ok) {
+        throw json;
+    }
+
+    return json;
+}
+
+export async function registrarVenta(data) {
+
+    const response = await fetch(`${API_URL}/ventas`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+        throw json;
+    }
+
+    return json;
+}

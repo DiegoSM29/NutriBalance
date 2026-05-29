@@ -6,6 +6,7 @@ use App\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Controllers\PedidoController;
 use App\Controllers\ProductoController;
+use App\Controllers\VentaController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -24,3 +25,6 @@ Route::get('/admin/productos', [ProductoController::class, 'index']);
 Route::post('/admin/productos', [ProductoController::class, 'store']);
 Route::put('/admin/productos/{id}', [ProductoController::class, 'update']);
 Route::delete('/admin/productos/{id}', [ProductoController::class, 'destroy']);
+
+Route::post('/ventas', [VentaController::class, 'store']);
+Route::get('/productos/disponibles', [ProductoController::class, 'disponibles']);
