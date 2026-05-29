@@ -1,24 +1,24 @@
 import { Routes, Route } from 'react-router-dom';
-import Register from './components/Register';
-import Login from './components/Login';
-import ClienteDashboard from './components/Client';
-import AdminDashboard from './components/AdminDashboard';
-import Profile from './components/Profile';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ClientPage from './pages/ClientPage';
+import AdminPage from './pages/AdminPage';
+import ProfilePage from './pages/ProfilePage';
+import ProductPage from './pages/ProductPage';
 import DashboardLayout from './components/DashboardLayout';
-import ProductDashboard from './components/ProductDashboard';
 
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
 
             <Route element={<DashboardLayout />}>
-                <Route path="/perfil" element={<Profile />} />
-                <Route path="/client" element={<ClienteDashboard />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/productos" element={<ProductDashboard />} />
+                <Route path="/perfil" element={<ProfilePage />} />
+                <Route path="/client" element={<ClientPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/productos" element={<ProductPage />} />
             </Route>
         </Routes>
     );

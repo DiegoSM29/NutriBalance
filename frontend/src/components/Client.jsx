@@ -1,106 +1,16 @@
-import { useState, useEffect } from 'react';
-import { getCatalogo, crearPedido } from '../services/api';
-
 const API_URL = 'http://localhost:8000';
 
-export default function ClienteDashboard() {
-    const user = JSON.parse(localStorage.getItem('user'));
-
-    const [productos, setProductos] = useState([]);
-    const [carrito, setCarrito] = useState([]);
-    const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        cargarCatalogo();
-    }, []);
-
-    const cargarCatalogo = async () => {
-        try {
-            const res = await getCatalogo();
-            if (res.success) setProductos(res.data);
-        } catch (error) {
-            console.error("Error al cargar el catalogo", error);
-        }
-    };
-
-    const agregarAlCarrito = (producto) => {
-        setMensaje({ tipo: '', texto: '' }); 
-
-        const itemExistente = carrito.find(item => item.id_producto === producto.id_producto);
-
-        if (itemExistente) {
-            // Usamos stock_actual segun tu DB
-            if (itemExistente.cantidad >= producto.stock_actual) {
-                setMensaje({ tipo: 'error', texto: `Solo hay ${producto.stock_actual} unidades disponibles.` });
-                return;
-            }
-            
-            setCarrito(carrito.map(item =>
-                item.id_producto === producto.id_producto
-                    ? { ...item, cantidad: item.cantidad + 1 }
-                    : item
-            ));
-        } else {
-            setCarrito([...carrito, { ...producto, cantidad: 1 }]);
-        }
-    };
-
-    const modificarCantidad = (id_producto, cambio) => {
-        setMensaje({ tipo: '', texto: '' }); 
-
-        const productoOriginal = productos.find(p => p.id_producto === id_producto);
-        const itemCarrito = carrito.find(c => c.id_producto === id_producto);
-        const nuevaCantidad = itemCarrito.cantidad + cambio;
-
-        if (nuevaCantidad === 0) {
-            setCarrito(carrito.filter(item => item.id_producto !== id_producto));
-            return;
-        }
-
-        if (nuevaCantidad > productoOriginal.stock_actual) {
-            setMensaje({ tipo: 'error', texto: `Stock maximo alcanzado.` });
-            return;
-        }
-
-        setCarrito(carrito.map(item =>
-            item.id_producto === id_producto
-                ? { ...item, cantidad: nuevaCantidad }
-                : item
-        ));
-    };
-
-    // Calculamos el total usando precio_venta
-    const totalCarrito = carrito.reduce((total, item) => total + (item.precio_venta * item.cantidad), 0);
-
-    const confirmarPedido = async () => {
-        if (carrito.length === 0) return;
-
-        setLoading(true);
-        setMensaje({ tipo: '', texto: '' });
-
-        try {
-            const datosPedido = {
-                productos: carrito.map(item => ({
-                    id_producto: item.id_producto,
-                    cantidad: item.cantidad
-                }))
-            };
-
-            const res = await crearPedido(datosPedido);
-
-            // En tu base de datos no hay "numero_pedido", usamos el ID autogenerado
-            setMensaje({ tipo: 'success', texto: `¡Pedido #${res.data.id_pedido} confirmado con exito!` });
-            setCarrito([]);
-            cargarCatalogo();
-
-        } catch (err) {
-            setMensaje({ tipo: 'error', texto: err.message || 'Error al procesar el pedido.' });
-        } finally {
-            setLoading(false);
-        }
-    };
-
+export default function ClienteDashboard({
+    user,
+    productos,
+    carrito,
+    mensaje,
+    loading,
+    totalCarrito,
+    agregarAlCarrito,
+    modificarCantidad,
+    confirmarPedido,
+}) {
     return (
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
             <div className="lg:w-2/3 flex flex-col gap-6">
@@ -140,12 +50,12 @@ export default function ClienteDashboard() {
                                     <p className="text-xs text-gray-400 mt-1">{producto.categoria} - {producto.tipo_producto}</p>
                                     <p className="text-emerald-600 font-bold text-lg mt-3">Bs {Number(producto.precio_venta).toFixed(2)}</p>
                                 </div>
-                                
+
                                 <div className="mt-4 flex items-center justify-between">
                                     <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
                                         Stock: {producto.stock_actual}
                                     </span>
-                                    <button 
+                                    <button
                                         onClick={() => agregarAlCarrito(producto)}
                                         className="bg-gray-800 hover:bg-black text-white p-2 rounded-lg transition-colors flex items-center justify-center"
                                         title="Agregar al carrito"
@@ -179,16 +89,16 @@ export default function ClienteDashboard() {
                                             <p className="text-sm font-medium text-gray-800 truncate">{item.nombre}</p>
                                             <p className="text-xs text-gray-500">Bs {Number(item.precio_venta).toFixed(2)} c/u</p>
                                         </div>
-                                        
+
                                         <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-md p-1 shadow-sm">
-                                            <button 
+                                            <button
                                                 onClick={() => modificarCantidad(item.id_producto, -1)}
                                                 className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-red-500 hover:bg-gray-50 rounded transition-colors"
                                             >
                                                 <i className="bi bi-dash"></i>
                                             </button>
                                             <span className="text-sm font-medium w-4 text-center">{item.cantidad}</span>
-                                            <button 
+                                            <button
                                                 onClick={() => modificarCantidad(item.id_producto, 1)}
                                                 className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-emerald-500 hover:bg-gray-50 rounded transition-colors"
                                             >
@@ -200,13 +110,13 @@ export default function ClienteDashboard() {
                             </div>
 
                             <hr className="border-gray-100 my-4" />
-                            
+
                             <div className="flex justify-between items-center mb-6">
                                 <span className="text-gray-500 font-medium">Total a pagar</span>
                                 <span className="text-2xl font-bold text-gray-800">Bs {totalCarrito.toFixed(2)}</span>
                             </div>
 
-                            <button 
+                            <button
                                 onClick={confirmarPedido}
                                 disabled={loading}
                                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-emerald-600/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
