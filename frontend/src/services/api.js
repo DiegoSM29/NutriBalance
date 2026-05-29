@@ -181,6 +181,14 @@ export async function eliminarAdminProducto(id) {
     return json;
 }
 
+export async function getClientes() {
+    const response = await fetch(`${API_URL}/clientes`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
 export async function getProductos() {
 
     const response = await fetch(`${API_URL}/productos/disponibles`);

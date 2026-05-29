@@ -11,6 +11,7 @@ use App\Controllers\VentaController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/usuarios', [AdminUserController::class, 'index']);
+Route::get('/clientes', [AdminUserController::class, 'clientes']);
 Route::post('/usuarios', [AdminUserController::class, 'store']);
 Route::put('/usuarios/{id}', [AdminUserController::class, 'update']);
 

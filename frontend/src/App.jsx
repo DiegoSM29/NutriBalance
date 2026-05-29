@@ -23,15 +23,15 @@ function App() {
                 <Route path="/client" element={<ClientPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/productos" element={<ProductPage />} />
+                <Route
+                    path="/ventas"
+                    element={
+                        <ProtectedRouteVentas>
+                            <Ventas />
+                        </ProtectedRouteVentas>
+                    }
+                />
             </Route>
-            <Route
-                path="/ventas"
-                element={
-                    <ProtectedRouteVentas>
-                        <Ventas />
-                    </ProtectedRouteVentas>
-                }
-            />
         </Routes>
     );
 }
