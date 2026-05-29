@@ -1,128 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
-import { getAdminProductos, crearAdminProducto, actualizarAdminProducto, eliminarAdminProducto } from '../services/api';
-
 const API_URL = 'http://localhost:8000';
 
-export default function ProductDashboard() {
-    const [productos, setProductos] = useState([]);
-    const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
-    const [loading, setLoading] = useState(false);
-    
-    // Controles de edicion
-    const [modoEdicion, setModoEdicion] = useState(false);
-    const [productoEditandoId, setProductoEditandoId] = useState(null);
-    const fileInputRef = useRef(null); // Para resetear el input de archivo
-
-    const initialForm = {
-        nombre: '',
-        categoria: 'Suplementos',
-        tipo_producto: 'Polvo',
-        precio_venta: '',
-        stock_actual: '',
-        stock_minimo: ''
-    };
-    
-    const [form, setForm] = useState(initialForm);
-    const [imagen, setImagen] = useState(null);
-
-    useEffect(() => {
-        cargarProductos();
-    }, []);
-
-    const cargarProductos = async () => {
-        try {
-            const res = await getAdminProductos();
-            if (res.success) setProductos(res.data);
-        } catch (error) {
-            console.error("Error cargando productos", error);
-        }
-    };
-
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleFileChange = (e) => {
-        if (e.target.files[0]) {
-            setImagen(e.target.files[0]);
-        }
-    };
-
-    // Funcion que carga los datos de un producto en el formulario para editarlo
-    const iniciarEdicion = (producto) => {
-        setModoEdicion(true);
-        setProductoEditandoId(producto.id_producto);
-        setForm({
-            nombre: producto.nombre,
-            categoria: producto.categoria || 'Suplementos',
-            tipo_producto: producto.tipo_producto || 'Polvo',
-            precio_venta: producto.precio_venta,
-            stock_actual: producto.stock_actual,
-            stock_minimo: producto.stock_minimo
-        });
-        setImagen(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube la pantalla al form
-    };
-
-    const cancelarEdicion = () => {
-        setModoEdicion(false);
-        setProductoEditandoId(null);
-        setForm(initialForm);
-        setImagen(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setMensaje({ tipo: '', texto: '' });
-
-        // Preparamos los datos en formato FormData para poder enviar la imagen
-        const formData = new FormData();
-        formData.append('nombre', form.nombre);
-        formData.append('categoria', form.categoria);
-        formData.append('tipo_producto', form.tipo_producto);
-        formData.append('precio_venta', form.precio_venta);
-        formData.append('stock_actual', form.stock_actual);
-        formData.append('stock_minimo', form.stock_minimo);
-        if (imagen) {
-            formData.append('imagen', imagen);
-        }
-
-        try {
-            let res;
-            if (modoEdicion) {
-                res = await actualizarAdminProducto(productoEditandoId, formData);
-            } else {
-                res = await crearAdminProducto(formData);
-            }
-            
-            setMensaje({ tipo: 'success', texto: res.message });
-            cancelarEdicion(); // Limpia todo
-            cargarProductos();
-        } catch (err) {
-            let errorTexto = 'Error al procesar el producto.';
-            if (err.errors) errorTexto = Object.values(err.errors)[0][0];
-            else if (err.message) errorTexto = err.message;
-            setMensaje({ tipo: 'error', texto: errorTexto });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleEliminar = async (id, nombre) => {
-        if (!window.confirm(`¿Estás seguro de eliminar el producto: ${nombre}?`)) return;
-
-        try {
-            const res = await eliminarAdminProducto(id);
-            setMensaje({ tipo: 'success', texto: res.message });
-            cargarProductos();
-        } catch (err) {
-            setMensaje({ tipo: 'error', texto: err.message || 'Error al eliminar.' });
-        }
-    };
-
+export default function ProductDashboard({
+    productos,
+    mensaje,
+    loading,
+    modoEdicion,
+    form,
+    fileInputRef,
+    handleChange,
+    handleFileChange,
+    handleSubmit,
+    iniciarEdicion,
+    cancelarEdicion,
+    handleEliminar,
+}) {
     return (
         <div className="max-w-7xl mx-auto">
             <header className="mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -138,7 +29,7 @@ export default function ProductDashboard() {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
+
                 {/* Formulario de Creación / Edición */}
                 <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
                     <h2 className="text-lg font-semibold mb-4 text-gray-800">
@@ -154,7 +45,7 @@ export default function ProductDashboard() {
                             <label className="block text-xs font-medium text-gray-600 mb-1">Imagen (Opcional)</label>
                             <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="w-full text-xs text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200" />
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-2">
                             <div>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">Categoría</label>
@@ -191,7 +82,7 @@ export default function ProductDashboard() {
                                 <input name="stock_minimo" type="number" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.stock_minimo} onChange={handleChange} />
                             </div>
                         </div>
-                        
+
                         <div className="pt-2 flex gap-2">
                             {modoEdicion && (
                                 <button type="button" onClick={cancelarEdicion} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 rounded transition-colors text-sm">
@@ -208,7 +99,7 @@ export default function ProductDashboard() {
                 {/* Tabla de Productos */}
                 <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h2 className="text-lg font-semibold mb-4 text-gray-800">Catálogo Actual</h2>
-                    
+
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -251,14 +142,14 @@ export default function ProductDashboard() {
                                                 </div>
                                             </td>
                                             <td className="p-3 text-center space-x-2">
-                                                <button 
+                                                <button
                                                     onClick={() => iniciarEdicion(p)}
                                                     className="text-blue-500 hover:text-blue-700 p-1 transition-colors"
                                                     title="Editar producto"
                                                 >
                                                     <i className="bi bi-pencil-square"></i>
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => handleEliminar(p.id_producto, p.nombre)}
                                                     className="text-red-500 hover:text-red-700 p-1 transition-colors"
                                                     title="Eliminar producto"

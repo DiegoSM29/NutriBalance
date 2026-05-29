@@ -1,79 +1,18 @@
-import { useState, useEffect } from 'react';
-import { getUsuarios, crearUsuario, actualizarUsuario } from '../services/api';
-import { useNavigate } from 'react-router-dom';
-
-export default function AdminDashboard() {
-    const navigate = useNavigate();
-    const adminActual = JSON.parse(localStorage.getItem('user'));
-
-    // --- ESTADOS: Todos agrupados al inicio ---
-    const [usuarios, setUsuarios] = useState([]);
-    const [busqueda, setBuscar] = useState('');
-    const [filtroRol, setFiltroRol] = useState('');
-    const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
-    const [showPassword, setShowPassword] = useState(false);
-    
-    const [form, setForm] = useState({ 
-        nombre: '', 
-        apellido: '', 
-        correo: '', 
-        password: '', 
-        password_confirmation: '', 
-        rol: 'ventas' 
-    });
-
-    useEffect(() => {
-        if (!adminActual || adminActual.rol !== 'admin') {
-            navigate('/login');
-        } else {
-            cargarUsuarios();
-        }
-    }, [busqueda, filtroRol]);
-
-    const cargarUsuarios = async () => {
-        try {
-            // Nota: Aquí se envía el filtroRol vacío si se selecciona "Todos los roles"
-            const res = await getUsuarios({ buscar: busqueda, rol: filtroRol });
-            if (res.success) setUsuarios(res.data);
-        } catch (error) {
-            console.error("Error cargando usuarios", error);
-        }
-    };
-
-    const handleCrearEmpleado = async (e) => {
-        e.preventDefault();
-
-        if (form.password !== form.password_confirmation) {
-            setMensaje({ tipo: 'error', texto: '¡Las contraseñas no coinciden!' });
-            return;
-        }
-
-        try {
-            const res = await crearUsuario(form);
-            setMensaje({ tipo: 'success', texto: res.message });
-            setForm({ nombre: '', apellido: '', correo: '', password: '', password_confirmation: '', rol: 'ventas' });
-            cargarUsuarios();
-        } catch (err) {
-            let errorTexto = 'Error al crear empleado. Revisa los datos.';
-            if (err.errors) {
-                errorTexto = Object.values(err.errors)[0][0];
-            } else if (err.message) {
-                errorTexto = err.message;
-            }
-            setMensaje({ tipo: 'error', texto: errorTexto });
-        }
-    };
-
-    const handleCambiarEstado = async (usuario) => {
-        try {
-            const res = await actualizarUsuario(usuario.id_usuario, { estado: !usuario.estado });
-            setMensaje({ tipo: 'success', texto: res.message });
-            cargarUsuarios();
-        } catch (err) {
-            setMensaje({ tipo: 'error', texto: err.message || 'Error al actualizar' });
-        }
-    };
-
+export default function AdminDashboard({
+    adminActual,
+    usuarios,
+    busqueda,
+    filtroRol,
+    mensaje,
+    form,
+    showPassword,
+    setBuscar,
+    setFiltroRol,
+    setForm,
+    setShowPassword,
+    handleCrearEmpleado,
+    handleCambiarEstado,
+}) {
     return (
         <div className="min-h-screen bg-gray-50 p-8">
             <div className="max-w-7xl mx-auto">

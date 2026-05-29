@@ -1,176 +1,27 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getPerfil, updatePerfil, uploadFoto } from '../services/api';
+const inputClass = "w-full px-4 py-3 ps-11 rounded-xl border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-sm";
+const iconClass = "absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg";
 
-const API_URL = 'http://localhost:8000';
-
-export default function Profile() {
-    const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user'));
-
-    const esCliente = user?.rol === 'cliente';
-
-    const [form, setForm] = useState({
-        nombre: '',
-        apellido: '',
-        correo: '',
-        telefono: '',
-        direccion: '',
-        password: '',
-        password_confirmation: '',
-        current_password: '',
-    });
-    const [foto, setFoto] = useState(null);
-    const [fotoPreview, setFotoPreview] = useState(null);
-    const [errors, setErrors] = useState({});
-    const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [uploadingFoto, setUploadingFoto] = useState(false);
-    const [ultimaActualizacion, setUltimaActualizacion] = useState(null);
-
-    useEffect(() => {
-        if (!user) {
-            navigate('/login');
-            return;
-        }
-        cargarPerfil();
-    }, []);
-
-    async function cargarPerfil() {
-        try {
-            const res = await getPerfil(user.id_usuario);
-            if (res.success) {
-                const u = res.data;
-                setForm({
-                    nombre: u.nombre || '',
-                    apellido: u.apellido || '',
-                    correo: u.correo || '',
-                    telefono: u.cliente?.telefono || '',
-                    direccion: u.cliente?.direccion || '',
-                    password: '',
-                    password_confirmation: '',
-                    current_password: '',
-                });
-                if (u.foto) {
-                    setFotoPreview(`${API_URL}/${u.foto}`);
-                }
-                setUltimaActualizacion(u.ultima_actualizacion);
-            }
-        } catch (err) {
-            console.error('Error cargando perfil', err);
-        }
-    }
-
-    function handleChange(e) {
-        setForm({ ...form, [e.target.name]: e.target.value });
-        if (errors[e.target.name]) {
-            setErrors({ ...errors, [e.target.name]: '' });
-        }
-    }
-
-    function handleFotoChange(e) {
-        const file = e.target.files[0];
-        if (file) {
-            setFoto(file);
-            setFotoPreview(URL.createObjectURL(file));
-        }
-    }
-
-    async function handleUploadFoto() {
-        if (!foto) return;
-        setUploadingFoto(true);
-        try {
-            const res = await uploadFoto(user.id_usuario, foto);
-            if (res.success) {
-                setMensaje({ tipo: 'success', texto: 'Foto actualizada correctamente.' });
-                const updatedUser = { ...user, foto: res.data.foto };
-                localStorage.setItem('user', JSON.stringify(updatedUser));
-                setFoto(null);
-                if (res.data.foto) {
-                    setFotoPreview(`${API_URL}/${res.data.foto}?_=${Date.now()}`);
-                }
-            }
-        } catch (err) {
-            setMensaje({ tipo: 'error', texto: err?.errors?.foto?.[0] || 'Error al subir foto.' });
-        } finally {
-            setUploadingFoto(false);
-        }
-    }
-
-    async function handleSubmit(e) {
-        e.preventDefault();
-        setMensaje({ tipo: '', texto: '' });
-        setErrors({});
-
-        const clientErrors = {};
-        if (!form.nombre.trim()) clientErrors.nombre = 'El nombre es obligatorio.';
-        if (!form.apellido.trim()) clientErrors.apellido = 'El apellido es obligatorio.';
-        if (form.password) {
-            if (!form.current_password) clientErrors.current_password = 'Ingresa tu contraseña actual.';
-            if (form.password.length < 8) clientErrors.password = 'Mínimo 8 caracteres.';
-            else if (!/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password)) clientErrors.password = 'Debe contener una letra y un número.';
-            if (form.password !== form.password_confirmation) clientErrors.password_confirmation = 'Las contraseñas no coinciden.';
-        }
-
-        if (Object.keys(clientErrors).length > 0) {
-            setErrors(clientErrors);
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const payload = {
-                nombre: form.nombre,
-                apellido: form.apellido,
-            };
-            if (esCliente) {
-                payload.telefono = form.telefono;
-                payload.direccion = form.direccion;
-            }
-            if (form.password) {
-                payload.password = form.password;
-                payload.password_confirmation = form.password_confirmation;
-                payload.current_password = form.current_password;
-            }
-
-            const res = await updatePerfil(user.id_usuario, payload);
-            if (res.success) {
-                const updatedUser = {
-                    ...user,
-                    nombre: res.data.nombre,
-                    apellido: res.data.apellido,
-                    foto: res.data.foto,
-                };
-                if (esCliente) {
-                    updatedUser.telefono = res.data.telefono;
-                    updatedUser.direccion = res.data.direccion;
-                }
-                localStorage.setItem('user', JSON.stringify(updatedUser));
-                setUltimaActualizacion(res.data.ultima_actualizacion);
-                setForm({ ...form, password: '', password_confirmation: '', current_password: '' });
-                setMensaje({ tipo: 'success', texto: 'Perfil actualizado correctamente.' });
-            }
-        } catch (err) {
-            if (err.errors) {
-                const fieldErrors = {};
-                for (const [key, msgs] of Object.entries(err.errors)) {
-                    fieldErrors[key] = msgs[0];
-                }
-                setErrors(fieldErrors);
-            } else {
-                setMensaje({ tipo: 'error', texto: err.message || 'Error al actualizar.' });
-            }
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const inputClass = "w-full px-4 py-3 ps-11 rounded-xl border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-sm";
-    const iconClass = "absolute start-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg";
-
+export default function Profile({
+    form,
+    errors,
+    mensaje,
+    loading,
+    uploadingFoto,
+    fotoPreview,
+    foto,
+    showCurrentPassword,
+    showNewPassword,
+    showConfirmPassword,
+    esCliente,
+    ultimaActualizacion,
+    handleChange,
+    handleSubmit,
+    handleFotoChange,
+    handleUploadFoto,
+    setShowCurrentPassword,
+    setShowNewPassword,
+    setShowConfirmPassword,
+}) {
     return (
         <div className="max-w-3xl mx-auto">
             <h1 className="text-2xl font-bold text-gray-800 mb-2">Mi Perfil</h1>
