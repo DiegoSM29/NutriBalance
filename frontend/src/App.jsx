@@ -6,6 +6,9 @@ import AdminDashboard from './components/AdminDashboard';
 import Profile from './components/Profile';
 import DashboardLayout from './components/DashboardLayout';
 import ProductDashboard from './components/ProductDashboard';
+import Ventas from './components/Ventas';
+import ProtectedRouteVentas from './components/ProtectedRouteVentas';
+
 
 function App() {
     return (
@@ -20,6 +23,14 @@ function App() {
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/productos" element={<ProductDashboard />} />
             </Route>
+            <Route
+                path="/ventas"
+                element={
+                    <ProtectedRouteVentas>
+                        <Ventas />
+                    </ProtectedRouteVentas>
+                }
+            />
         </Routes>
     );
 }

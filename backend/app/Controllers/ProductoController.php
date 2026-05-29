@@ -8,104 +8,116 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductoController extends Controller
 {
-    // Listar todos los productos para la tabla del administrador
-    public function index()
-    {
-        return response()->json([
-            'success' => true,
-            'data' => Producto::all()
-        ]);
-    }
+	// Listar todos los productos para la tabla del administrador
+	public function index()
+	{
+		return response()->json([
+			'success' => true,
+			'data' => Producto::all()
+		]);
+	}
 
-    // Crear un nuevo producto
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:30',
-            'categoria' => 'nullable|string|max:40',
-            'tipo_producto' => 'nullable|string|max:40',
-            'precio_venta' => 'required|numeric|min:0',
-            'stock_actual' => 'required|integer|min:0',
-            'stock_minimo' => 'required|integer|min:0',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
-        ]);
+	// Productos disponibles para ventas
+	public function disponibles()
+	{
+		$productos = Producto::where('stock_actual', '>', 0)
+			->get();
 
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
+		return response()->json([
+			'success' => true,
+			'data' => $productos
+		]);
+	}
 
-        $data = $request->all();
+	// Crear un nuevo producto
+	public function store(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'nombre' => 'required|string|max:30',
+			'categoria' => 'nullable|string|max:40',
+			'tipo_producto' => 'nullable|string|max:40',
+			'precio_venta' => 'required|numeric|min:0',
+			'stock_actual' => 'required|integer|min:0',
+			'stock_minimo' => 'required|integer|min:0',
+			'imagen' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
+		]);
 
-        // Si viene una imagen, la guardamos en public/productos
-        if ($request->hasFile('imagen')) {
-            $file = $request->file('imagen');
-            $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
-            $file->move(public_path('productos'), $filename);
-            $data['imagen'] = 'productos/' . $filename;
-        }
+		if ($validator->fails()) {
+			return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+		}
 
-        $producto = Producto::create($data);
+		$data = $request->all();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Producto creado con exito.',
-            'data' => $producto
-        ], 201);
-    }
+		// Si viene una imagen, la guardamos en public/productos
+		if ($request->hasFile('imagen')) {
+			$file = $request->file('imagen');
+			$filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+			$file->move(public_path('productos'), $filename);
+			$data['imagen'] = 'productos/' . $filename;
+		}
 
-    // Actualizar un producto existente
-    public function update(Request $request, $id)
-    {
-        $producto = Producto::find($id);
+		$producto = Producto::create($data);
 
-        if (!$producto) {
-            return response()->json(['success' => false, 'message' => 'Producto no encontrado'], 404);
-        }
+		return response()->json([
+			'success' => true,
+			'message' => 'Producto creado con exito.',
+			'data' => $producto
+		], 201);
+	}
 
-        $data = $request->all();
+	// Actualizar un producto existente
+	public function update(Request $request, $id)
+	{
+		$producto = Producto::find($id);
 
-        if ($request->hasFile('imagen')) {
-            // Borrar la imagen anterior si existe
-            if ($producto->imagen && file_exists(public_path($producto->imagen))) {
-                unlink(public_path($producto->imagen));
-            }
+		if (!$producto) {
+			return response()->json(['success' => false, 'message' => 'Producto no encontrado'], 404);
+		}
 
-            $file = $request->file('imagen');
-            $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
-            $file->move(public_path('productos'), $filename);
-            $data['imagen'] = 'productos/' . $filename;
-        }
+		$data = $request->all();
 
-        $producto->update($data);
+		if ($request->hasFile('imagen')) {
+			// Borrar la imagen anterior si existe
+			if ($producto->imagen && file_exists(public_path($producto->imagen))) {
+				unlink(public_path($producto->imagen));
+			}
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Producto actualizado correctamente.',
-            'data' => $producto
-        ]);
-    }
-    
-    // Eliminar un producto
-    public function destroy($id)
-    {
-        $producto = Producto::find($id);
+			$file = $request->file('imagen');
+			$filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+			$file->move(public_path('productos'), $filename);
+			$data['imagen'] = 'productos/' . $filename;
+		}
 
-        if (!$producto) {
-            return response()->json(['success' => false, 'message' => 'Producto no encontrado'], 404);
-        }
+		$producto->update($data);
 
-        try {
-            $producto->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Producto eliminado correctamente.'
-            ]);
-        } catch (\Exception $e) {
-            // Seguridad: Previene que borren un producto que ya alguien compro
-            return response()->json([
-                'success' => false,
-                'message' => 'No se puede eliminar el producto porque ya esta en el historial de un pedido o movimiento.'
-            ], 400);
-        }
-    }
+		return response()->json([
+			'success' => true,
+			'message' => 'Producto actualizado correctamente.',
+			'data' => $producto
+		]);
+	}
+
+	// Eliminar un producto
+	public function destroy($id)
+	{
+		$producto = Producto::find($id);
+
+		if (!$producto) {
+			return response()->json(['success' => false, 'message' => 'Producto no encontrado'], 404);
+		}
+
+		try {
+			$producto->delete();
+			return response()->json([
+				'success' => true,
+				'message' => 'Producto eliminado correctamente.'
+			]);
+		} catch (\Exception $e) {
+			// Seguridad: Previene que borren un producto que ya alguien compro
+			return response()->json([
+				'success' => false,
+				'message' => 'No se puede eliminar el producto porque ya esta en el historial de un pedido o movimiento.'
+			], 400);
+		}
+	}
 }
