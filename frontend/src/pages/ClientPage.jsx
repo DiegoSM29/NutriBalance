@@ -9,6 +9,8 @@ export default function ClientPage() {
     const [carrito, setCarrito] = useState([]);
     const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
     const [loading, setLoading] = useState(false);
+    const [showPagoModal, setShowPagoModal] = useState(false);
+    const [comprobante, setComprobante] = useState(null);
 
     useEffect(() => {
         cargarCatalogo();
@@ -70,8 +72,20 @@ export default function ClientPage() {
 
     const totalCarrito = carrito.reduce((total, item) => total + (item.precio_venta * item.cantidad), 0);
 
-    const confirmarPedido = async () => {
+    const abrirModalPago = () => {
         if (carrito.length === 0) return;
+        setMensaje({ tipo: '', texto: '' });
+        setComprobante(null);
+        setShowPagoModal(true);
+    };
+
+    const cerrarModalPago = () => {
+        setShowPagoModal(false);
+        setComprobante(null);
+    };
+
+    const confirmarPedido = async () => {
+        if (!comprobante) return;
 
         setLoading(true);
         setMensaje({ tipo: '', texto: '' });
@@ -84,14 +98,16 @@ export default function ClientPage() {
                 }))
             };
 
-            const res = await crearPedido(datosPedido);
+            const res = await crearPedido(datosPedido, comprobante);
 
+            setShowPagoModal(false);
+            setComprobante(null);
             setMensaje({ tipo: 'success', texto: `¡Pedido #${res.data.id_pedido} confirmado con exito!` });
             setCarrito([]);
             cargarCatalogo();
 
         } catch (err) {
-            setMensaje({ tipo: 'error', texto: err.message || 'Error al procesar el pedido.' });
+            setMensaje({ tipo: 'error', texto: err.errors?.comprobante?.[0] || err.message || 'Error al procesar el pedido.' });
         } finally {
             setLoading(false);
         }
@@ -108,6 +124,12 @@ export default function ClientPage() {
             agregarAlCarrito={agregarAlCarrito}
             modificarCantidad={modificarCantidad}
             confirmarPedido={confirmarPedido}
+            showPagoModal={showPagoModal}
+            comprobante={comprobante}
+            onAbrirModalPago={abrirModalPago}
+            onSeleccionarComprobante={setComprobante}
+            onConfirmarPago={confirmarPedido}
+            onCerrarModal={cerrarModalPago}
         />
     );
 }

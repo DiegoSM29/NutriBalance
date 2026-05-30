@@ -117,24 +117,42 @@ export async function getCatalogo() {
 }
 
 // Enviar el carrito para crear un pedido nuevo
-export async function crearPedido(data) {
-    // Obtenemos el cliente actual para enviar su ID en los headers
+export async function crearPedido(data, comprobante) {
     const clienteActual = JSON.parse(localStorage.getItem('user'));
+
+    const formData = new FormData();
+    formData.append('productos', JSON.stringify(data.productos));
+    if (comprobante) {
+        formData.append('comprobante', comprobante);
+    }
     
     const response = await fetch(`${API_URL}/pedidos`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'X-User-Id': clienteActual.id_usuario // Enviamos el ID del cliente para validacion
+            'X-User-Id': clienteActual.id_usuario
         },
-        body: JSON.stringify(data),
+        body: formData,
     });
     
     const json = await response.json();
     if (!response.ok) throw json;
     
     return json;
+}
+
+export async function getMisPedidos() {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/pedidos/cliente`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user.id_usuario
+        },
+    });
+
+    return response.json();
 }
 
 // GESTION DE PRODUCTOS (ADMIN/INVENTARIO)

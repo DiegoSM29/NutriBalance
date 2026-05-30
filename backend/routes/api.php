@@ -21,6 +21,7 @@ Route::post('/perfil/{id}/foto', [ProfileController::class, 'uploadFoto']);
 
 Route::get('/catalogo', [PedidoController::class, 'catalogo']);
 Route::post('/pedidos', [PedidoController::class, 'store']);
+Route::get('/pedidos/cliente', [PedidoController::class, 'misPedidos']);
 
 Route::get('/admin/productos', [ProductoController::class, 'index']);
 Route::post('/admin/productos', [ProductoController::class, 'store']);

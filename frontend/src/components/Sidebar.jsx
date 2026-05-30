@@ -25,6 +25,7 @@ const menuItems = {
     cliente: [
         { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
         { label: 'Mi Tienda', path: '/client', icon: 'bi-shop' },
+        { label: 'Mis Pedidos', path: '/mis-pedidos', icon: 'bi-box-seam' },
     ],
 };
 
