@@ -6,6 +6,7 @@ import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
 import ProductPage from './pages/ProductPage';
 import MisPedidosPage from './pages/MisPedidosPage';
+import GestionPedidosPage from './pages/GestionPedidosPage';
 import DashboardLayout from './components/DashboardLayout';
 import ProductDashboard from './components/ProductDashboard';
 import Ventas from './components/Ventas';
@@ -23,6 +24,7 @@ function App() {
                 <Route path="/perfil" element={<ProfilePage />} />
                 <Route path="/client" element={<ClientPage />} />
                 <Route path="/mis-pedidos" element={<MisPedidosPage />} />
+                <Route path="/pedidos" element={<GestionPedidosPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/productos" element={<ProductPage />} />
                 <Route

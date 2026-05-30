@@ -58,7 +58,8 @@ export default function LoginPage() {
             const role = result.data.usuario.rol;
             const destino = role === 'admin' ? '/admin' :
                 role === 'cliente' ? '/client' :
-                    '/perfil';
+                    role === 'pedidos' ? '/pedidos' :
+                        '/perfil';
 
             navigate(destino);
 

@@ -155,6 +155,30 @@ export async function getMisPedidos() {
     return response.json();
 }
 
+export async function getTodosPedidos() {
+    const response = await fetch(`${API_URL}/pedidos`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+
+    return response.json();
+}
+
+export async function actualizarEstadoPedido(id, estado) {
+    const response = await fetch(`${API_URL}/pedidos/${id}/estado`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ estado }),
+    });
+
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
 // GESTION DE PRODUCTOS (ADMIN/INVENTARIO)
 export async function getAdminProductos() {
     const response = await fetch(`${API_URL}/admin/productos`, {

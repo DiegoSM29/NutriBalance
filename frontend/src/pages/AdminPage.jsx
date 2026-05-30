@@ -73,6 +73,17 @@ export default function AdminPage() {
         }
     };
 
+    const handleCambiarRol = async (usuario, nuevoRol) => {
+        if (nuevoRol === usuario.rol) return;
+        try {
+            const res = await actualizarUsuario(usuario.id_usuario, { rol: nuevoRol });
+            setMensaje({ tipo: 'success', texto: `Rol cambiado a ${nuevoRol}` });
+            cargarUsuarios();
+        } catch (err) {
+            setMensaje({ tipo: 'error', texto: err.message || 'Error al cambiar rol' });
+        }
+    };
+
     return (
         <AdminDashboard
             adminActual={adminActual}
@@ -88,6 +99,7 @@ export default function AdminPage() {
             setShowPassword={setShowPassword}
             handleCrearEmpleado={handleCrearEmpleado}
             handleCambiarEstado={handleCambiarEstado}
+            handleCambiarRol={handleCambiarRol}
         />
     );
 }

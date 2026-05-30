@@ -12,6 +12,71 @@ use Illuminate\Support\Facades\Validator;
 
 class PedidoController extends Controller
 {
+    public function todosPedidos()
+    {
+        $pedidos = Pedido::with(['detalles.producto', 'cliente.usuario'])
+            ->orderBy('fecha_pedido', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $pedidos
+        ]);
+    }
+
+    public function actualizarEstado(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'estado' => 'required|in:pendiente,confirmado,preparacion,enviado,entregado,rechazado'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $pedido = Pedido::with('detalles')->find($id);
+
+        if (!$pedido) {
+            return response()->json(['success' => false, 'message' => 'Pedido no encontrado.'], 404);
+        }
+
+        if ($request->estado === 'rechazado') {
+            try {
+                DB::beginTransaction();
+
+                foreach ($pedido->detalles as $detalle) {
+                    Producto::where('id_producto', $detalle->id_producto)
+                        ->increment('stock_actual', $detalle->cantidad);
+                }
+
+                DetallePedido::where('id_pedido', $id)->delete();
+                $pedido->delete();
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pedido rechazado y eliminado. Stock restaurado.'
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 400);
+            }
+        }
+
+        $pedido->estado = $request->estado;
+        $pedido->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Estado del pedido actualizado a ' . $request->estado . '.',
+            'data' => $pedido
+        ]);
+    }
+
     public function misPedidos(Request $request)
     {
         $id_usuario = $request->header('X-User-Id');
