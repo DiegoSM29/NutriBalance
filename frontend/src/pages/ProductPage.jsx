@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getAdminProductos, crearAdminProducto, actualizarAdminProducto, eliminarAdminProducto } from '../services/api';
+import { getAdminProductos, crearAdminProducto, actualizarAdminProducto, eliminarAdminProducto, getAlertas, marcarAlertaLeida } from '../services/api';
 import ProductDashboard from '../components/ProductDashboard';
 
 const initialForm = {
@@ -13,8 +13,12 @@ const initialForm = {
 
 export default function ProductPage() {
     const [productos, setProductos] = useState([]);
+    const [alertas, setAlertas] = useState([]); 
     const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
     const [loading, setLoading] = useState(false);
+    
+    // Estado para controlar qué pestaña se muestra
+    const [activeTab, setActiveTab] = useState('catalogo'); 
 
     const [modoEdicion, setModoEdicion] = useState(false);
     const [productoEditandoId, setProductoEditandoId] = useState(null);
@@ -23,8 +27,12 @@ export default function ProductPage() {
     const [form, setForm] = useState(initialForm);
     const [imagen, setImagen] = useState(null);
 
+    // Obtenemos el usuario actual para enviar su ID en los headers de las alertas
+    const usuarioActual = JSON.parse(localStorage.getItem('user'));
+
     useEffect(() => {
         cargarProductos();
+        cargarAlertas();
     }, []);
 
     const cargarProductos = async () => {
@@ -33,6 +41,37 @@ export default function ProductPage() {
             if (res.success) setProductos(res.data);
         } catch (error) {
             console.error("Error cargando productos", error);
+        }
+    };
+
+    const cargarAlertas = async () => {
+        try {
+            // Le pasamos un header manual (simulando lo que hara axios/fetch) si no lo tenemos global
+            const response = await fetch('http://localhost:8000/api/alertas', {
+                method: 'GET',
+                headers: { 
+                    'Accept': 'application/json',
+                    'X-User-Id': usuarioActual?.id_usuario 
+                },
+            });
+            const res = await response.json();
+            if (res.success) setAlertas(res.data);
+        } catch (error) {
+            console.error("Error cargando alertas", error);
+        }
+    };
+
+    const handleMarcarLeida = async (id) => {
+        try {
+            const res = await marcarAlertaLeida(id);
+            if (res.success) {
+                // Actualizamos el estado local para mover la alerta al historial
+                setAlertas(alertas.map(a => 
+                    a.id_alerta === id ? { ...a, leida: true } : a
+                ));
+            }
+        } catch (error) {
+            console.error("Error al marcar alerta", error);
         }
     };
 
@@ -97,6 +136,7 @@ export default function ProductPage() {
             setMensaje({ tipo: 'success', texto: res.message });
             cancelarEdicion();
             cargarProductos();
+            cargarAlertas(); 
         } catch (err) {
             let errorTexto = 'Error al procesar el producto.';
             if (err.errors) errorTexto = Object.values(err.errors)[0][0];
@@ -122,6 +162,7 @@ export default function ProductPage() {
     return (
         <ProductDashboard
             productos={productos}
+            alertas={alertas} 
             mensaje={mensaje}
             loading={loading}
             modoEdicion={modoEdicion}
@@ -133,6 +174,9 @@ export default function ProductPage() {
             iniciarEdicion={iniciarEdicion}
             cancelarEdicion={cancelarEdicion}
             handleEliminar={handleEliminar}
+            handleMarcarLeida={handleMarcarLeida}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
         />
     );
 }

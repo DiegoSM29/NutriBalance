@@ -89,6 +89,9 @@ class PedidoController extends Controller
                 // Restamos del stock_actual
                 $detalle['producto']->stock_actual -= $detalle['cantidad'];
                 $detalle['producto']->save();
+
+                // --- NUEVA LÍNEA: VERIFICAMOS EL STOCK LUEGO DE GUARDAR ---
+                \App\Models\AlertaStock::verificarStock($detalle['producto']);
             }
 
             DB::commit();
