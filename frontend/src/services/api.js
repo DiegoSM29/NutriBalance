@@ -262,3 +262,20 @@ export async function registrarVenta(data) {
 
     return json;
 }
+
+// GESTIÓN DE ALERTAS DE STOCK
+export async function getAlertas() {
+    const response = await fetch(`${API_URL}/alertas`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function marcarAlertaLeida(id) {
+    const response = await fetch(`${API_URL}/alertas/${id}/leer`, {
+        method: 'PUT',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}

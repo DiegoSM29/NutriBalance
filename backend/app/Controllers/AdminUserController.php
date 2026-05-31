@@ -89,7 +89,7 @@ class AdminUserController extends Controller
             'correo'   => $request->correo,
             'password' => Hash::make($request->password),
             'rol'      => $request->rol,
-            'estado'   => true // Por defecto habilitado
+            'estado'   => true
         ]);
 
         // Registrar en log las acciones importantes
@@ -97,7 +97,7 @@ class AdminUserController extends Controller
 
         return response()->json([
             'success' => true, 
-            'message' => 'Usuario creado con éxito.' //
+            'message' => 'Usuario creado con éxito.'
         ], 201);
     }
 

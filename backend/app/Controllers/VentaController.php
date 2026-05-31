@@ -6,7 +6,6 @@ use App\Models\Venta;
 use App\Models\Producto;
 use App\Models\DetalleVenta;
 use App\Models\MovimientoInventario;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -111,8 +110,10 @@ class VentaController extends Controller
         ]);
 
         $producto->stock_actual -= $item['cantidad'];
-
         $producto->save();
+
+        // --- NUEVA LINEA: VERIFICAMOS EL STOCK LUEGO DE VENDER ---
+        \App\Models\AlertaStock::verificarStock($producto);
 
         MovimientoInventario::create([
           'id_producto' => $producto->id_producto,
