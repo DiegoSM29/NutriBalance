@@ -22,9 +22,14 @@ const menuItems = {
         { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
         { label: 'Logística', path: '/logistica', icon: 'bi-truck' },
     ],
+    pedidos: [
+        { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
+        { label: 'Pedidos', path: '/pedidos', icon: 'bi-box-seam' },
+    ],
     cliente: [
         { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
         { label: 'Mi Tienda', path: '/client', icon: 'bi-shop' },
+        { label: 'Mis Pedidos', path: '/mis-pedidos', icon: 'bi-box-seam' },
     ],
 };
 
@@ -34,6 +39,7 @@ const roleLabels = {
     inventario: 'Inventario',
     produccion: 'Producción',
     logistica: 'Logística',
+    pedidos: 'Pedidos',
     cliente: 'Cliente',
 };
 

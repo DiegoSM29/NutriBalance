@@ -1,5 +1,7 @@
 const API_URL = 'http://localhost:8000';
 
+import qrImage from '../assets/qr.jpeg';
+
 export default function ClienteDashboard({
     user,
     productos,
@@ -10,8 +12,15 @@ export default function ClienteDashboard({
     agregarAlCarrito,
     modificarCantidad,
     confirmarPedido,
+    showPagoModal,
+    comprobante,
+    onAbrirModalPago,
+    onSeleccionarComprobante,
+    onConfirmarPago,
+    onCerrarModal,
 }) {
     return (
+        <>
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
             <div className="lg:w-2/3 flex flex-col gap-6">
                 <div>
@@ -117,7 +126,7 @@ export default function ClienteDashboard({
                             </div>
 
                             <button
-                                onClick={confirmarPedido}
+                                onClick={onAbrirModalPago}
                                 disabled={loading}
                                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-emerald-600/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
@@ -137,5 +146,91 @@ export default function ClienteDashboard({
                 </div>
             </div>
         </div>
+
+            {showPagoModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative animate-fade-in">
+                        <button
+                            onClick={onCerrarModal}
+                            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+
+                        <h2 className="text-lg font-bold text-gray-800 text-center mb-2">Pagar con QR</h2>
+                        <p className="text-sm text-gray-500 text-center mb-5">
+                            Escanea el código QR para realizar tu pago y sube el comprobante.
+                        </p>
+
+                        <div className="flex justify-center mb-5">
+                            <div className="w-52 h-52 rounded-xl border-2 border-dashed border-gray-200 p-2 bg-gray-50 flex items-center justify-center">
+                                <img
+                                    src={qrImage}
+                                    alt="QR de pago"
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mb-5">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <i className="bi bi-image me-1"></i>
+                                Sube tu comprobante de pago
+                            </label>
+                            <div
+                                onClick={() => document.getElementById('comprobante-input').click()}
+                                className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors"
+                            >
+                                {comprobante ? (
+                                    <div className="flex items-center justify-center gap-2 text-emerald-600">
+                                        <i className="bi bi-check-circle-fill text-lg"></i>
+                                        <span className="text-sm font-medium">{comprobante.name}</span>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onSeleccionarComprobante(null); }}
+                                            className="text-red-500 hover:text-red-700 ml-1"
+                                        >
+                                            <i className="bi bi-x-circle"></i>
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <i className="bi bi-cloud-arrow-up text-3xl text-gray-300 block mb-1"></i>
+                                        <p className="text-sm text-gray-500">Haz clic para seleccionar la imagen</p>
+                                        <p className="text-xs text-gray-400 mt-1">JPG, PNG o WebP · Max 5MB</p>
+                                    </div>
+                                )}
+                            </div>
+                            <input
+                                id="comprobante-input"
+                                type="file"
+                                accept="image/jpeg,image/png,image/jpg,image/gif,image/webp"
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files[0]) onSeleccionarComprobante(e.target.files[0]);
+                                    e.target.value = '';
+                                }}
+                            />
+                        </div>
+
+                        <button
+                            onClick={onConfirmarPago}
+                            disabled={loading || !comprobante}
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-emerald-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                    Procesando...
+                                </>
+                            ) : (
+                                <>
+                                    Pagar y Confirmar Pedido <i className="bi bi-check-lg"></i>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }

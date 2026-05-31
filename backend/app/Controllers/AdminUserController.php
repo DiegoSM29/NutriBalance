@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\User;
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -10,6 +11,30 @@ use Illuminate\Support\Facades\Log;
 
 class AdminUserController extends Controller
 {
+    /**
+     * Listar clientes con su id_cliente de la tabla clientes
+     */
+    public function clientes()
+    {
+        $usuarios = User::where('rol', 'cliente')
+            ->with('cliente')
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id_cliente' => $user->cliente?->id_cliente,
+                    'id_usuario' => $user->id_usuario,
+                    'nombre'     => $user->nombre,
+                    'apellido'   => $user->apellido,
+                    'correo'     => $user->correo,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $usuarios
+        ]);
+    }
+
     /**
      * Listar todos los usuarios con opciones de búsqueda y filtrado
      */
@@ -48,7 +73,7 @@ class AdminUserController extends Controller
             'apellido'  => 'required|string|max:30',
             'correo'    => 'required|email|unique:usuarios,correo',
             'password'  => 'required|string|min:8',
-            'rol'       => 'required|in:admin,ventas,inventario,produccion,logistica,cliente'
+            'rol'       => 'required|in:admin,ventas,inventario,produccion,logistica,pedidos,cliente'
         ]);
 
         if ($validator->fails()) {
@@ -64,7 +89,7 @@ class AdminUserController extends Controller
             'correo'   => $request->correo,
             'password' => Hash::make($request->password),
             'rol'      => $request->rol,
-            'estado'   => true // Por defecto habilitado
+            'estado'   => true
         ]);
 
         // Registrar en log las acciones importantes
@@ -72,7 +97,7 @@ class AdminUserController extends Controller
 
         return response()->json([
             'success' => true, 
-            'message' => 'Usuario creado con éxito.' //
+            'message' => 'Usuario creado con éxito.'
         ], 201);
     }
 

@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   getProductos,
+  getClientes,
   registrarVenta
 } from '../services/api';
+
+const API_URL = 'http://localhost:8000';
 
 export default function Ventas() {
 
@@ -17,15 +20,42 @@ export default function Ventas() {
 
   const [search, setSearch] = useState('');
 
-  const [clienteId, setClienteId] = useState('');
+  const [clientes, setClientes] = useState([]);
+  const [clienteSearch, setClienteSearch] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedCliente, setSelectedCliente] = useState(null);
 
   const [message, setMessage] = useState('');
 
   const [error, setError] = useState('');
 
+  const clienteRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (clienteRef.current && !clienteRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   useEffect(() => {
     loadProductos();
+    loadClientes();
   }, []);
+
+  async function loadClientes() {
+    try {
+      const result = await getClientes();
+      if (result.success) {
+        setClientes(result.data);
+      }
+    } catch (err) {
+      console.error('Error cargando clientes', err);
+    }
+  }
 
   async function loadProductos() {
 
@@ -119,7 +149,7 @@ export default function Ventas() {
       return;
     }
 
-    if (!clienteId) {
+    if (!selectedCliente) {
 
       setError('Debe seleccionar cliente.');
 
@@ -130,7 +160,7 @@ export default function Ventas() {
 
       const payload = {
 
-        id_cliente: Number(clienteId),
+        id_cliente: Number(selectedCliente.id_cliente),
 
         id_usuario: user.id_usuario,
 
@@ -225,10 +255,24 @@ export default function Ventas() {
 
                 {filteredProductos.map(producto => (
 
-                  <div
+                    <div
                     key={producto.id_producto}
                     className="border border-gray-200 rounded-2xl p-4 hover:shadow-lg transition-all"
                   >
+
+                    {producto.imagen ? (
+                      <div className="w-full h-32 rounded-lg overflow-hidden mb-3 bg-gray-100">
+                        <img
+                          src={`${API_URL}/${producto.imagen}`}
+                          alt={producto.nombre}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-32 rounded-lg mb-3 bg-gray-100 flex items-center justify-center">
+                        <i className="bi bi-image text-gray-400 text-3xl"></i>
+                      </div>
+                    )}
 
                     <h3 className="font-semibold text-gray-800">
                       {producto.nombre}
@@ -276,19 +320,53 @@ export default function Ventas() {
             </h2>
 
             {/* CLIENTE */}
-            <div className="mb-5">
+            <div className="mb-5 relative" ref={clienteRef}>
 
               <label className="block text-sm font-medium text-gray-600 mb-2">
                 Cliente
               </label>
 
               <input
-                type="number"
-                placeholder="ID Cliente"
-                value={clienteId}
-                onChange={(e) => setClienteId(e.target.value)}
+                type="text"
+                placeholder="Buscar cliente por nombre..."
+                value={selectedCliente ? `${selectedCliente.nombre} ${selectedCliente.apellido}` : clienteSearch}
+                onChange={(e) => {
+                  setSelectedCliente(null);
+                  setClienteSearch(e.target.value);
+                  setShowDropdown(true);
+                }}
+                onFocus={() => setShowDropdown(true)}
                 className="w-full border border-gray-300 rounded-xl px-4 py-3"
               />
+
+              {showDropdown && (
+                <div className="absolute z-10 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                  {clientes
+                    .filter(c =>
+                      !clienteSearch ||
+                      c.nombre.toLowerCase().includes(clienteSearch.toLowerCase()) ||
+                      c.apellido.toLowerCase().includes(clienteSearch.toLowerCase())
+                    )
+                    .map(c => (
+                      <button
+                        key={c.id_cliente}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCliente(c);
+                          setClienteSearch('');
+                          setShowDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                      >
+                        <span className="font-medium text-gray-800">{c.nombre} {c.apellido}</span>
+                        <span className="text-xs text-gray-400 ml-2">({c.correo})</span>
+                      </button>
+                    ))}
+                  {clientes.length === 0 && (
+                    <p className="px-4 py-3 text-sm text-gray-400">No hay clientes registrados</p>
+                  )}
+                </div>
+              )}
 
             </div>
 
