@@ -73,7 +73,7 @@ class AdminUserController extends Controller
             'apellido'  => 'required|string|max:30',
             'correo'    => 'required|email|unique:usuarios,correo',
             'password'  => 'required|string|min:8',
-            'rol'       => 'required|in:admin,ventas,inventario,produccion,logistica,cliente'
+            'rol'       => 'required|in:admin,ventas,inventario,produccion,logistica,pedidos,cliente'
         ]);
 
         if ($validator->fails()) {
