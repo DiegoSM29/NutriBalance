@@ -17,6 +17,7 @@ import Ventas from './pages/Ventas';
 import MisVentasPage from './pages/MisVentasPage';
 import OrdenProduccionPage from './pages/OrdenProduccionPage';
 import ProtectedRouteVentas from './components/ProtectedRouteVentas';
+import ReportePage from './pages/ReportePage';
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/productos" element={<ProductPage />} />
                 <Route path="/produccion" element={<OrdenProduccionPage />} />
+                <Route path="/reportes" element={<ReportePage />} />
                 <Route
                     path="/mis-ventas"
                     element={
