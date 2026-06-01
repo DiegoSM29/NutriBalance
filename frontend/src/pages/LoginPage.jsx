@@ -55,13 +55,7 @@ export default function LoginPage() {
 
             localStorage.setItem('user', JSON.stringify(result.data.usuario));
 
-            const role = result.data.usuario.rol;
-            const destino = role === 'admin' ? '/admin' :
-                role === 'cliente' ? '/client' :
-                    role === 'pedidos' ? '/pedidos' :
-                        '/perfil';
-
-            navigate(destino);
+            navigate('/empresa');
 
         } catch (err) {
             setServerError(err.message || 'Credenciales incorrectas.');

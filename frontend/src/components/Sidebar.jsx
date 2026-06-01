@@ -1,35 +1,46 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 
+const empresaItem = { label: 'Empresa', path: '/empresa', icon: 'bi-building' };
+
+const perfilItem = { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' };
+
 const menuItems = {
     admin: [
-        { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
+        empresaItem,
         { label: 'Usuarios', path: '/admin', icon: 'bi-people' },
         { label: 'Productos', path: '/productos', icon: 'bi-box-seam' },
+        perfilItem,
     ],
     ventas: [
-        { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
+        empresaItem,
         { label: 'Ventas', path: '/ventas', icon: 'bi-cart' },
+        perfilItem,
     ],
     inventario: [
-        { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
+        empresaItem,
         { label: 'Productos', path: '/productos', icon: 'bi-box-seam' },
+        perfilItem,
     ],
     produccion: [
-        { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
+        empresaItem,
         { label: 'Producción', path: '/produccion', icon: 'bi-gear' },
+        perfilItem,
     ],
     logistica: [
-        { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
+        empresaItem,
         { label: 'Logística', path: '/logistica', icon: 'bi-truck' },
+        perfilItem,
     ],
     pedidos: [
-        { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
+        empresaItem,
         { label: 'Pedidos', path: '/pedidos', icon: 'bi-box-seam' },
+        perfilItem,
     ],
     cliente: [
-        { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' },
+        empresaItem,
         { label: 'Mi Tienda', path: '/client', icon: 'bi-shop' },
         { label: 'Mis Pedidos', path: '/mis-pedidos', icon: 'bi-box-seam' },
+        perfilItem,
     ],
 };
 
