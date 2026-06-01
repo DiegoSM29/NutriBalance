@@ -32,7 +32,7 @@ export async function loginUser(data) {
 }
 
 export async function getUsuarios(filtros = {}) {
-    // Construimos los parámetros de búsqueda de la URL (?buscar=...&rol=...)
+
     const query = new URLSearchParams(filtros).toString();
     const response = await fetch(`${API_URL}/usuarios?${query}`, {
         method: 'GET',
@@ -90,7 +90,7 @@ export async function uploadFoto(id, file) {
 }
 
 export async function actualizarUsuario(id, data) {
-    // Necesitamos pasar el ID del admin actual para la validación de no auto-deshabilitarse
+
     const adminActual = JSON.parse(localStorage.getItem('user'));
     
     const response = await fetch(`${API_URL}/usuarios/${id}`, {
@@ -107,7 +107,6 @@ export async function actualizarUsuario(id, data) {
     return json;
 }
 
-// Obtener productos disponibles en el catalogo
 export async function getCatalogo() {
     const response = await fetch(`${API_URL}/catalogo`, {
         method: 'GET',
@@ -116,7 +115,6 @@ export async function getCatalogo() {
     return response.json();
 }
 
-// Enviar el carrito para crear un pedido nuevo
 export async function crearPedido(data, comprobante) {
     const clienteActual = JSON.parse(localStorage.getItem('user'));
 
@@ -179,7 +177,6 @@ export async function actualizarEstadoPedido(id, estado) {
     return json;
 }
 
-// GESTION DE PRODUCTOS (ADMIN/INVENTARIO)
 export async function getAdminProductos() {
     const response = await fetch(`${API_URL}/admin/productos`, {
         method: 'GET',
@@ -189,7 +186,7 @@ export async function getAdminProductos() {
 }
 
 export async function crearAdminProducto(formData) {
-    // Al enviar FormData, NO debes poner el header 'Content-Type'
+
     const response = await fetch(`${API_URL}/admin/productos`, {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
@@ -201,10 +198,10 @@ export async function crearAdminProducto(formData) {
 }
 
 export async function actualizarAdminProducto(id, formData) {
-    // Laravel requiere este "truco" para recibir archivos en una actualizacion (PUT)
+
     formData.append('_method', 'PUT'); 
     const response = await fetch(`${API_URL}/admin/productos/${id}`, {
-        method: 'POST', // Se envía como POST por culpa de los archivos
+        method: 'POST',
         headers: { 'Accept': 'application/json' },
         body: formData,
     });
@@ -324,7 +321,6 @@ export async function getMisVentas() {
     return response.json();
 }
 
-// GESTIÓN DE ALERTAS DE STOCK
 export async function getAlertas() {
     const response = await fetch(`${API_URL}/alertas`, {
         method: 'GET',
@@ -341,7 +337,6 @@ export async function marcarAlertaLeida(id) {
     return response.json();
 }
 
-// ÓRDENES DE PRODUCCIÓN
 export async function getOrdenesProduccion(estado = '') {
     const query = estado ? `?estado=${estado}` : '';
     const response = await fetch(`${API_URL}/ordenes-produccion${query}`, {
@@ -383,6 +378,20 @@ export async function actualizarOrdenProduccion(id, data) {
             'Accept': 'application/json',
         },
         body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function getReporte(tipo, inicio, fin) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/reportes/${tipo}?inicio=${inicio}&fin=${fin}`, {
+        method: 'GET',
+        headers: { 
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario 
+        },
     });
     const json = await response.json();
     if (!response.ok) throw json;

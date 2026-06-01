@@ -25,7 +25,7 @@ class PedidoController extends Controller
         ]);
     }
 
-    public function actualizarEstado(Request $request, $id)
+    public function actualizarEstado(Request $request, int $id)
     {
         $validator = Validator::make($request->all(), [
             'estado' => 'required|in:pendiente,confirmado,preparacion,enviado,entregado,rechazado'

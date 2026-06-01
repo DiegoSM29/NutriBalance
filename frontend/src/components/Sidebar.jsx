@@ -9,6 +9,7 @@ const menuItems = {
         empresaItem,
         { label: 'Usuarios', path: '/admin', icon: 'bi-people' },
         { label: 'Productos', path: '/productos', icon: 'bi-box-seam' },
+        { label: 'Reportes y BI', path: '/reportes', icon: 'bi-graph-up' },
         perfilItem,
     ],
     ventas: [

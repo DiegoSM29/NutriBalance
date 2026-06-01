@@ -11,6 +11,7 @@ use App\Controllers\AlertaStockController;
 use App\Controllers\MovimientoInventarioController;
 use App\Controllers\MisVentaController;
 use App\Controllers\OrdenProduccionController;
+use App\Controllers\ReporteController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -49,3 +50,7 @@ Route::get('/ordenes-produccion', [OrdenProduccionController::class, 'index']);
 Route::post('/ordenes-produccion', [OrdenProduccionController::class, 'store']);
 Route::get('/ordenes-produccion/{id}', [OrdenProduccionController::class, 'show']);
 Route::put('/ordenes-produccion/{id}', [OrdenProduccionController::class, 'update']);
+
+Route::get('/reportes/ventas', [ReporteController::class, 'ventas']);
+Route::get('/reportes/inventario', [ReporteController::class, 'inventario']);
+Route::get('/reportes/produccion', [ReporteController::class, 'produccion']);
