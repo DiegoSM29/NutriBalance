@@ -1,3 +1,13 @@
+const roleLabels = {
+    admin: 'Administrador',
+    ventas: 'Ventas',
+    inventario: 'Inventario',
+    produccion: 'Producción',
+    logistica: 'Logística',
+    pedidos: 'Pedidos',
+    cliente: 'Cliente',
+};
+
 export default function AdminDashboard({
     adminActual,
     usuarios,
@@ -12,6 +22,7 @@ export default function AdminDashboard({
     setShowPassword,
     handleCrearEmpleado,
     handleCambiarEstado,
+    handleCambiarRol,
 }) {
     return (
         <div className="min-h-screen bg-gray-50 p-8">
@@ -72,6 +83,7 @@ export default function AdminDashboard({
                                 <option value="inventario">Inventario</option>
                                 <option value="produccion">Producción</option>
                                 <option value="logistica">Logística</option>
+                                <option value="pedidos">Pedidos</option>
                             </select>
                             
                             <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded transition-colors text-sm">
@@ -93,6 +105,7 @@ export default function AdminDashboard({
                                     <option value="inventario">Inventario</option>
                                     <option value="produccion">Producción</option>
                                     <option value="logistica">Logística</option>
+                                    <option value="pedidos">Pedidos</option>
                                 </select>
                             </div>
                         </div>
@@ -114,7 +127,25 @@ export default function AdminDashboard({
                                                 <div className="font-medium text-gray-800">{u.nombre} {u.apellido}</div>
                                                 <div className="text-gray-500 text-xs">{u.correo}</div>
                                             </td>
-                                            <td className="p-3 capitalize">{u.rol}</td>
+                                            <td className="p-3">
+                                                {u.id_usuario !== adminActual.id_usuario ? (
+                                                    <select
+                                                        value={u.rol}
+                                                        onChange={(e) => handleCambiarRol(u, e.target.value)}
+                                                        className="p-1 border rounded text-xs bg-white capitalize"
+                                                    >
+                                                        <option value="admin">Administrador</option>
+                                                        <option value="ventas">Ventas</option>
+                                                        <option value="inventario">Inventario</option>
+                                                        <option value="produccion">Producción</option>
+                                                        <option value="logistica">Logística</option>
+                                                        <option value="pedidos">Pedidos</option>
+                                                        <option value="cliente">Cliente</option>
+                                                    </select>
+                                                ) : (
+                                                    <span className="capitalize text-sm font-medium text-gray-800">Administrador</span>
+                                                )}
+                                            </td>
                                             <td className="p-3">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${u.estado ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
                                                     {u.estado ? 'Activo' : 'Inactivo'}

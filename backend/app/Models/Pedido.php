@@ -15,7 +15,8 @@ class Pedido extends Model
         'fecha_pedido',
         'fecha_entrega',
         'estado',
-        'total'
+        'total',
+        'comprobante'
     ];
 
     public function cliente()

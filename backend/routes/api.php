@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use App\Controllers\PedidoController;
 use App\Controllers\ProductoController;
 use App\Controllers\VentaController;
+use App\Controllers\AlertaStockController;
+use App\Controllers\MovimientoInventarioController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -21,6 +23,9 @@ Route::post('/perfil/{id}/foto', [ProfileController::class, 'uploadFoto']);
 
 Route::get('/catalogo', [PedidoController::class, 'catalogo']);
 Route::post('/pedidos', [PedidoController::class, 'store']);
+Route::get('/pedidos/cliente', [PedidoController::class, 'misPedidos']);
+Route::get('/pedidos', [PedidoController::class, 'todosPedidos']);
+Route::put('/pedidos/{id}/estado', [PedidoController::class, 'actualizarEstado']);
 
 Route::get('/admin/productos', [ProductoController::class, 'index']);
 Route::post('/admin/productos', [ProductoController::class, 'store']);
@@ -29,3 +34,10 @@ Route::delete('/admin/productos/{id}', [ProductoController::class, 'destroy']);
 
 Route::post('/ventas', [VentaController::class, 'store']);
 Route::get('/productos/disponibles', [ProductoController::class, 'disponibles']);
+
+Route::get('/alertas', [AlertaStockController::class, 'index']);
+Route::put('/alertas/{id}/leer', [AlertaStockController::class, 'marcarLeida']);
+
+Route::get('/movimientos', [MovimientoInventarioController::class, 'index']);
+Route::post('/movimientos/entrada', [MovimientoInventarioController::class, 'entrada']);
+Route::post('/movimientos/salida', [MovimientoInventarioController::class, 'salida']);

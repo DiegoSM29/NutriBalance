@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { getAdminProductos, crearAdminProducto, actualizarAdminProducto, eliminarAdminProducto } from '../services/api';
+import {
+    getAdminProductos, crearAdminProducto, actualizarAdminProducto,
+    eliminarAdminProducto, getAlertas, marcarAlertaLeida,
+    getMovimientos, registrarEntradaStock, registrarSalidaStock
+} from '../services/api';
 import ProductDashboard from '../components/ProductDashboard';
 
 const initialForm = {
@@ -11,20 +15,32 @@ const initialForm = {
     stock_minimo: ''
 };
 
+const initialAjusteForm = {
+    cantidad: '',
+    motivo: ''
+};
+
 export default function ProductPage() {
     const [productos, setProductos] = useState([]);
+    const [alertas, setAlertas] = useState([]);
+    const [movimientos, setMovimientos] = useState([]);
     const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
     const [loading, setLoading] = useState(false);
-
+    const [activeTab, setActiveTab] = useState('catalogo');
     const [modoEdicion, setModoEdicion] = useState(false);
     const [productoEditandoId, setProductoEditandoId] = useState(null);
     const fileInputRef = useRef(null);
-
     const [form, setForm] = useState(initialForm);
     const [imagen, setImagen] = useState(null);
+    const [ajusteModal, setAjusteModal] = useState({ visible: false, tipo: 'entrada', producto: null });
+    const [ajusteForm, setAjusteForm] = useState(initialAjusteForm);
+
+    const usuarioActual = JSON.parse(localStorage.getItem('user'));
 
     useEffect(() => {
         cargarProductos();
+        cargarAlertas();
+        cargarMovimientos();
     }, []);
 
     const cargarProductos = async () => {
@@ -33,6 +49,44 @@ export default function ProductPage() {
             if (res.success) setProductos(res.data);
         } catch (error) {
             console.error("Error cargando productos", error);
+        }
+    };
+
+    const cargarAlertas = async () => {
+        try {
+            const response = await fetch('http://localhost:8000/api/alertas', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-User-Id': usuarioActual?.id_usuario
+                },
+            });
+            const res = await response.json();
+            if (res.success) setAlertas(res.data);
+        } catch (error) {
+            console.error("Error cargando alertas", error);
+        }
+    };
+
+    const cargarMovimientos = async () => {
+        try {
+            const res = await getMovimientos();
+            if (res.success) setMovimientos(res.data);
+        } catch (error) {
+            console.error("Error cargando movimientos", error);
+        }
+    };
+
+    const handleMarcarLeida = async (id) => {
+        try {
+            const res = await marcarAlertaLeida(id);
+            if (res.success) {
+                setAlertas(alertas.map(a =>
+                    a.id_alerta === id ? { ...a, leida: true } : a
+                ));
+            }
+        } catch (error) {
+            console.error("Error al marcar alerta", error);
         }
     };
 
@@ -97,6 +151,7 @@ export default function ProductPage() {
             setMensaje({ tipo: 'success', texto: res.message });
             cancelarEdicion();
             cargarProductos();
+            cargarAlertas();
         } catch (err) {
             let errorTexto = 'Error al procesar el producto.';
             if (err.errors) errorTexto = Object.values(err.errors)[0][0];
@@ -119,9 +174,61 @@ export default function ProductPage() {
         }
     };
 
+    const abrirAjusteEntrada = (producto) => {
+        setAjusteModal({ visible: true, tipo: 'entrada', producto });
+        setAjusteForm(initialAjusteForm);
+    };
+
+    const abrirAjusteSalida = (producto) => {
+        setAjusteModal({ visible: true, tipo: 'salida', producto });
+        setAjusteForm(initialAjusteForm);
+    };
+
+    const cerrarAjusteModal = () => {
+        setAjusteModal({ visible: false, tipo: 'entrada', producto: null });
+        setAjusteForm(initialAjusteForm);
+    };
+
+    const handleAjusteChange = (e) => {
+        setAjusteForm({ ...ajusteForm, [e.target.name]: e.target.value });
+    };
+
+    const handleAjusteSubmit = async (e) => {
+        e.preventDefault();
+        setMensaje({ tipo: '', texto: '' });
+
+        try {
+            const data = {
+                id_producto: ajusteModal.producto.id_producto,
+                cantidad: parseInt(ajusteForm.cantidad),
+                motivo: ajusteForm.motivo
+            };
+
+            let res;
+            if (ajusteModal.tipo === 'entrada') {
+                res = await registrarEntradaStock(data);
+            } else {
+                res = await registrarSalidaStock(data);
+            }
+
+            setMensaje({ tipo: 'success', texto: res.message });
+            cerrarAjusteModal();
+            cargarProductos();
+            cargarMovimientos();
+            cargarAlertas();
+        } catch (err) {
+            let errorTexto = 'Error al ajustar stock.';
+            if (err.errors) errorTexto = Object.values(err.errors)[0][0];
+            else if (err.message) errorTexto = err.message;
+            setMensaje({ tipo: 'error', texto: errorTexto });
+        }
+    };
+
     return (
         <ProductDashboard
             productos={productos}
+            alertas={alertas}
+            movimientos={movimientos}
             mensaje={mensaje}
             loading={loading}
             modoEdicion={modoEdicion}
@@ -133,6 +240,16 @@ export default function ProductPage() {
             iniciarEdicion={iniciarEdicion}
             cancelarEdicion={cancelarEdicion}
             handleEliminar={handleEliminar}
+            handleMarcarLeida={handleMarcarLeida}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            ajusteModal={ajusteModal}
+            abrirAjusteEntrada={abrirAjusteEntrada}
+            abrirAjusteSalida={abrirAjusteSalida}
+            cerrarAjusteModal={cerrarAjusteModal}
+            ajusteForm={ajusteForm}
+            handleAjusteChange={handleAjusteChange}
+            handleAjusteSubmit={handleAjusteSubmit}
         />
     );
 }

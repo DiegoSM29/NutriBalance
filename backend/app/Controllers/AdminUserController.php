@@ -73,7 +73,7 @@ class AdminUserController extends Controller
             'apellido'  => 'required|string|max:30',
             'correo'    => 'required|email|unique:usuarios,correo',
             'password'  => 'required|string|min:8',
-            'rol'       => 'required|in:admin,ventas,inventario,produccion,logistica,cliente'
+            'rol'       => 'required|in:admin,ventas,inventario,produccion,logistica,pedidos,cliente'
         ]);
 
         if ($validator->fails()) {
@@ -89,7 +89,7 @@ class AdminUserController extends Controller
             'correo'   => $request->correo,
             'password' => Hash::make($request->password),
             'rol'      => $request->rol,
-            'estado'   => true // Por defecto habilitado
+            'estado'   => true
         ]);
 
         // Registrar en log las acciones importantes
@@ -97,7 +97,7 @@ class AdminUserController extends Controller
 
         return response()->json([
             'success' => true, 
-            'message' => 'Usuario creado con éxito.' //
+            'message' => 'Usuario creado con éxito.'
         ], 201);
     }
 
