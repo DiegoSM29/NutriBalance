@@ -10,6 +10,7 @@ use App\Controllers\VentaController;
 use App\Controllers\AlertaStockController;
 use App\Controllers\MovimientoInventarioController;
 use App\Controllers\MisVentaController;
+use App\Controllers\NotificacionController;
 use App\Controllers\OrdenProduccionController;
 use App\Controllers\ReporteController;
 
@@ -28,6 +29,8 @@ Route::get('/catalogo', [PedidoController::class, 'catalogo']);
 Route::post('/pedidos', [PedidoController::class, 'store']);
 Route::get('/pedidos/cliente', [PedidoController::class, 'misPedidos']);
 Route::get('/pedidos', [PedidoController::class, 'todosPedidos']);
+Route::get('/pedidos/logistica', [PedidoController::class, 'pedidosLogistica']);
+Route::get('/pedidos/{id}/historial', [PedidoController::class, 'historial']);
 Route::put('/pedidos/{id}/estado', [PedidoController::class, 'actualizarEstado']);
 
 Route::get('/admin/productos', [ProductoController::class, 'index']);
@@ -45,6 +48,11 @@ Route::put('/alertas/{id}/leer', [AlertaStockController::class, 'marcarLeida']);
 Route::get('/movimientos', [MovimientoInventarioController::class, 'index']);
 Route::post('/movimientos/entrada', [MovimientoInventarioController::class, 'entrada']);
 Route::post('/movimientos/salida', [MovimientoInventarioController::class, 'salida']);
+
+Route::get('/notificaciones', [NotificacionController::class, 'misNotificaciones']);
+Route::get('/notificaciones/no-leidas', [NotificacionController::class, 'noLeidas']);
+Route::put('/notificaciones/{id}/leer', [NotificacionController::class, 'marcarLeida']);
+Route::put('/notificaciones/leer-todas', [NotificacionController::class, 'marcarTodasLeidas']);
 
 Route::get('/ordenes-produccion', [OrdenProduccionController::class, 'index']);
 Route::post('/ordenes-produccion', [OrdenProduccionController::class, 'store']);

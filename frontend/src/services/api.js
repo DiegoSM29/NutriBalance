@@ -162,14 +162,19 @@ export async function getTodosPedidos() {
     return response.json();
 }
 
-export async function actualizarEstadoPedido(id, estado) {
+export async function actualizarEstadoPedido(id, estado, observacion = '') {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const body = { estado };
+    if (observacion) body.observacion = observacion;
+
     const response = await fetch(`${API_URL}/pedidos/${id}/estado`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario,
         },
-        body: JSON.stringify({ estado }),
+        body: JSON.stringify(body),
     });
 
     const json = await response.json();

@@ -42,6 +42,8 @@ const menuItems = {
         empresaItem,
         { label: 'Mi Tienda', path: '/client', icon: 'bi-shop' },
         { label: 'Mis Pedidos', path: '/mis-pedidos', icon: 'bi-box-seam' },
+        { label: 'Mis Facturas', path: '/mis-facturas', icon: 'bi-receipt' },
+        { label: 'Notificaciones', path: '/notificaciones', icon: 'bi-bell' },
         perfilItem,
     ],
 };
