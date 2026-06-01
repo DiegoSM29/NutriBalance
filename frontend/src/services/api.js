@@ -311,6 +311,19 @@ export async function registrarSalidaStock(data) {
     return json;
 }
 
+// MIS VENTAS (VENDEDOR)
+export async function getMisVentas() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/mis-ventas`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
 // GESTIÓN DE ALERTAS DE STOCK
 export async function getAlertas() {
     const response = await fetch(`${API_URL}/alertas`, {

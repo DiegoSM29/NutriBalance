@@ -9,6 +9,7 @@ use App\Controllers\ProductoController;
 use App\Controllers\VentaController;
 use App\Controllers\AlertaStockController;
 use App\Controllers\MovimientoInventarioController;
+use App\Controllers\MisVentaController;
 use App\Controllers\OrdenProduccionController;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -34,6 +35,7 @@ Route::put('/admin/productos/{id}', [ProductoController::class, 'update']);
 Route::delete('/admin/productos/{id}', [ProductoController::class, 'destroy']);
 
 Route::post('/ventas', [VentaController::class, 'store']);
+Route::get('/mis-ventas', [MisVentaController::class, 'index']);
 Route::get('/productos/disponibles', [ProductoController::class, 'disponibles']);
 
 Route::get('/alertas', [AlertaStockController::class, 'index']);
