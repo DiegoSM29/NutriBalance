@@ -29,26 +29,7 @@ class PedidoController extends Controller
         ]);
     }
 
-    public function pedidosLogistica(Request $request)
-    {
-        $estado = $request->query('estado', '');
-
-        $query = Pedido::with(['detalles.producto', 'cliente.usuario'])
-            ->whereIn('estado', ['confirmado', 'preparacion', 'enviado', 'entregado']);
-
-        if (!empty($estado)) {
-            $query->where('estado', $estado);
-        }
-
-        $pedidos = $query->orderBy('fecha_pedido', 'desc')->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $pedidos
-        ]);
-    }
-
-    public function actualizarEstado(Request $request, $id)
+    public function actualizarEstado(Request $request, int $id)
     {
         $validator = Validator::make($request->all(), [
             'estado' => 'required|in:pendiente,confirmado,preparacion,enviado,entregado,rechazado',
