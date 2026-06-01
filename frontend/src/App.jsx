@@ -10,7 +10,7 @@ import MisPedidosPage from './pages/MisPedidosPage';
 import GestionPedidosPage from './pages/GestionPedidosPage';
 import DashboardLayout from './components/DashboardLayout';
 import ProductDashboard from './components/ProductDashboard';
-import Ventas from './components/Ventas';
+import Ventas from './pages/Ventas';
 import ProtectedRouteVentas from './components/ProtectedRouteVentas';
 
 

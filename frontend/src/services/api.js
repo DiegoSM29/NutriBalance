@@ -263,6 +263,54 @@ export async function registrarVenta(data) {
     return json;
 }
 
+// MOVIMIENTOS DE INVENTARIO
+export async function getMovimientos() {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/movimientos`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
+export async function registrarEntradaStock(data) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/movimientos/entrada`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function registrarSalidaStock(data) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/movimientos/salida`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
 // GESTIÓN DE ALERTAS DE STOCK
 export async function getAlertas() {
     const response = await fetch(`${API_URL}/alertas`, {
