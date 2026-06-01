@@ -14,8 +14,13 @@ class AdminUserController extends Controller
     /**
      * Listar clientes con su id_cliente de la tabla clientes
      */
-    public function clientes()
+    public function clientes(Request $request)
     {
+        $admin = User::find($request->header('X-User-Id'));
+        if (!$admin || !in_array($admin->rol, ['admin', 'ventas'])) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
         $usuarios = User::where('rol', 'cliente')
             ->with('cliente')
             ->get()
@@ -40,6 +45,11 @@ class AdminUserController extends Controller
      */
     public function index(Request $request)
     {
+        $admin = User::find($request->header('X-User-Id'));
+        if (!$admin || !in_array($admin->rol, ['admin', 'ventas'])) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
         $query = User::query();
 
         // Filtro por rol: filled() ignora automáticamente valores vacíos o nulos
@@ -68,6 +78,11 @@ class AdminUserController extends Controller
      */
     public function store(Request $request)
     {
+        $admin = User::find($request->header('X-User-Id'));
+        if (!$admin || $admin->rol !== 'admin') {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'nombre'    => 'required|string|max:30',
             'apellido'  => 'required|string|max:30',
@@ -101,11 +116,67 @@ class AdminUserController extends Controller
         ], 201);
     }
 
+    public function storeCliente(Request $request)
+    {
+        $user = User::find($request->header('X-User-Id'));
+        if (!$user || !in_array($user->rol, ['admin', 'ventas'])) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nombre'    => 'required|string|max:30',
+            'apellido'  => 'required|string|max:30',
+            'correo'    => 'required|email|unique:usuarios,correo',
+            'telefono'  => 'nullable|string|max:16',
+            'direccion' => 'nullable|string|max:40',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $newUser = User::create([
+            'nombre'   => $request->nombre,
+            'apellido' => $request->apellido,
+            'correo'   => $request->correo,
+            'password' => Hash::make('user123'),
+            'rol'      => 'cliente',
+            'estado'   => true,
+        ]);
+
+        $cliente = Cliente::create([
+            'id_usuario'  => $newUser->id_usuario,
+            'telefono'    => $request->telefono,
+            'direccion'   => $request->direccion,
+            'tipo_cliente'=> 'particular',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cliente registrado con éxito.',
+            'data'    => [
+                'id_cliente' => $cliente->id_cliente,
+                'id_usuario' => $newUser->id_usuario,
+                'nombre'     => $newUser->nombre,
+                'apellido'   => $newUser->apellido,
+                'correo'     => $newUser->correo,
+            ]
+        ], 201);
+    }
+
     /**
      * Actualizar rol o estado (habilitar/deshabilitar)
      */
     public function update(Request $request, $id)
     {
+        $admin = User::find($request->header('X-User-Id'));
+        if (!$admin || $admin->rol !== 'admin') {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
         $user = User::find($id);
 
         if (!$user) {

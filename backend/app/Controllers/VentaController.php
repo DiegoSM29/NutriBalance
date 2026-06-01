@@ -2,10 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Models\User;
 use App\Models\Venta;
 use App\Models\Producto;
 use App\Models\DetalleVenta;
 use App\Models\MovimientoInventario;
+use App\Models\AlertaStock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +16,7 @@ class VentaController extends Controller
 {
   public function store(Request $request)
   {
-    $user = \App\Models\User::find($request->id_usuario);
+    $user = User::find($request->id_usuario);
 
     if (!$user || $user->rol !== 'ventas') {
 
@@ -113,7 +115,7 @@ class VentaController extends Controller
         $producto->save();
 
         // --- NUEVA LINEA: VERIFICAMOS EL STOCK LUEGO DE VENDER ---
-        \App\Models\AlertaStock::verificarStock($producto);
+        AlertaStock::verificarStock($producto);
 
         MovimientoInventario::create([
           'id_producto' => $producto->id_producto,

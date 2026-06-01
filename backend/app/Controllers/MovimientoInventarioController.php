@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\Producto;
 use App\Models\MovimientoInventario;
 use App\Models\AlertaStock;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -13,7 +14,7 @@ class MovimientoInventarioController extends Controller
 {
     public function index(Request $request)
     {
-        $user = \App\Models\User::find($request->header('X-User-Id'));
+        $user = User::find($request->header('X-User-Id'));
 
         if ($user && !in_array($user->rol, ['admin', 'inventario'])) {
             return response()->json(['success' => false], 403);
@@ -32,7 +33,7 @@ class MovimientoInventarioController extends Controller
 
     public function entrada(Request $request)
     {
-        $user = \App\Models\User::find($request->header('X-User-Id'));
+        $user = User::find($request->header('X-User-Id'));
 
         if ($user && !in_array($user->rol, ['admin', 'inventario'])) {
             return response()->json(['success' => false], 403);
@@ -85,7 +86,7 @@ class MovimientoInventarioController extends Controller
 
     public function salida(Request $request)
     {
-        $user = \App\Models\User::find($request->header('X-User-Id'));
+        $user = User::find($request->header('X-User-Id'));
 
         if ($user && !in_array($user->rol, ['admin', 'inventario'])) {
             return response()->json(['success' => false], 403);

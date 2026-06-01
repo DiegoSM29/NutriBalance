@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import {
   getProductos,
   getClientes,
-  registrarVenta
+  registrarVenta,
+  crearCliente
 } from '../services/api';
 
 const API_URL = 'http://localhost:8000';
@@ -28,6 +29,10 @@ export default function Ventas() {
   const [message, setMessage] = useState('');
 
   const [error, setError] = useState('');
+
+  const [showClienteModal, setShowClienteModal] = useState(false);
+  const [nuevoCliente, setNuevoCliente] = useState({ nombre: '', apellido: '', correo: '', telefono: '', direccion: '' });
+  const [creandoCliente, setCreandoCliente] = useState(false);
 
   const clienteRef = useRef(null);
 
@@ -54,6 +59,23 @@ export default function Ventas() {
       }
     } catch (err) {
       console.error('Error cargando clientes', err);
+    }
+  }
+
+  async function handleCrearCliente(e) {
+    e.preventDefault();
+    setCreandoCliente(true);
+    try {
+      const res = await crearCliente(nuevoCliente);
+      setMessage(`Cliente ${res.data.nombre} ${res.data.apellido} creado con éxito`);
+      setShowClienteModal(false);
+      setNuevoCliente({ nombre: '', apellido: '', correo: '', telefono: '', direccion: '' });
+      await loadClientes();
+      setSelectedCliente(res.data);
+    } catch (err) {
+      setError(err.errors ? Object.values(err.errors)[0][0] : err.message || 'Error al crear cliente');
+    } finally {
+      setCreandoCliente(false);
     }
   }
 
@@ -362,8 +384,22 @@ export default function Ventas() {
                         <span className="text-xs text-gray-400 ml-2">({c.correo})</span>
                       </button>
                     ))}
-                  {clientes.length === 0 && (
-                    <p className="px-4 py-3 text-sm text-gray-400">No hay clientes registrados</p>
+                  {clientes.filter(c =>
+                    !clienteSearch ||
+                    c.nombre.toLowerCase().includes(clienteSearch.toLowerCase()) ||
+                    c.apellido.toLowerCase().includes(clienteSearch.toLowerCase())
+                  ).length === 0 && (
+                    <div className="p-3">
+                      <p className="text-sm text-gray-400 mb-2">No se encontraron clientes</p>
+                      <button
+                        type="button"
+                        onClick={() => setShowClienteModal(true)}
+                        className="w-full text-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-lg transition-colors"
+                      >
+                        <i className="bi bi-plus-circle me-1"></i>
+                        Nuevo Cliente
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
@@ -451,6 +487,96 @@ export default function Ventas() {
           </div>
         </div>
       </div>
+      {/* MODAL NUEVO CLIENTE */}
+      {showClienteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
+            <button
+              onClick={() => setShowClienteModal(false)}
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+
+            <h2 className="text-lg font-bold text-gray-800 mb-5">Registrar Nuevo Cliente</h2>
+
+            <form onSubmit={handleCrearCliente} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                  <input
+                    type="text"
+                    required
+                    value={nuevoCliente.nombre}
+                    onChange={(e) => setNuevoCliente({ ...nuevoCliente, nombre: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+                  <input
+                    type="text"
+                    required
+                    value={nuevoCliente.apellido}
+                    onChange={(e) => setNuevoCliente({ ...nuevoCliente, apellido: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+                <input
+                  type="email"
+                  required
+                  value={nuevoCliente.correo}
+                  onChange={(e) => setNuevoCliente({ ...nuevoCliente, correo: e.target.value })}
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                  <input
+                    type="text"
+                    value={nuevoCliente.telefono}
+                    onChange={(e) => setNuevoCliente({ ...nuevoCliente, telefono: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                  <input
+                    type="text"
+                    value={nuevoCliente.direccion}
+                    onChange={(e) => setNuevoCliente({ ...nuevoCliente, direccion: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={creandoCliente}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {creandoCliente ? (
+                  <>
+                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    Creando...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-person-plus"></i>
+                    Registrar Cliente
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

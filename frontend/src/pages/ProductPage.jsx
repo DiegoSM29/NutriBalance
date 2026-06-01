@@ -54,14 +54,7 @@ export default function ProductPage() {
 
     const cargarAlertas = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/alertas', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-User-Id': usuarioActual?.id_usuario
-                },
-            });
-            const res = await response.json();
+            const res = await getAlertas();
             if (res.success) setAlertas(res.data);
         } catch (error) {
             console.error("Error cargando alertas", error);

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import fondoVideo from '../assets/Fondo1.mp4';
 
 const inputClass =
@@ -177,12 +178,12 @@ export default function Login({
 
                         <p className="text-center text-gray-400 text-xs mt-4">
                             ¿No tienes cuenta?{' '}
-                            <a
-                                href="/register"
+                            <Link
+                                to="/register"
                                 className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
                             >
                                 Regístrate
-                            </a>
+                            </Link>
                         </p>
                     </form>
                 </div>

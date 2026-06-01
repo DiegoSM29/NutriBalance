@@ -11,10 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. Borramos la tabla si quedó creada a medias
-        Schema::dropIfExists('alertas_stock');
-
-        // 2. Creamos la tabla con la estructura correcta
+        if (Schema::hasTable('alertas_stock')) return;
         Schema::create('alertas_stock', function (Blueprint $table) {
             $table->id('id_alerta');
             

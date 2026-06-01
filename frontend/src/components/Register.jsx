@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import fondoVideo from '../assets/Fondo1.mp4';
 
 const inputClass = "w-full px-4 py-3 ps-11 rounded-xl border border-gray-300 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-sm";
@@ -179,9 +180,9 @@ export default function Register({
 
                         <p className="text-center text-gray-400 text-xs mt-4">
                             ¿Ya tienes cuenta?{' '}
-                            <a href="login" className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
+                            <Link to="/login" className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
                                 Inicia sesión
-                            </a>
+                            </Link>
                         </p>
                     </form>
                 </div>

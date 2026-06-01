@@ -6,7 +6,12 @@ export default function DashboardLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const location = useLocation();
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    let user;
+    try {
+        user = JSON.parse(localStorage.getItem('user'));
+    } catch {
+        user = null;
+    }
 
     if (!user) {
         return <Navigate to="/login" replace />;

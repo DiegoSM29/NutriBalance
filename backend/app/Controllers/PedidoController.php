@@ -9,6 +9,7 @@ use App\Models\Cliente;
 use App\Models\HistorialEstadoPedido;
 use App\Models\Notificacion;
 use App\Models\MovimientoInventario;
+use App\Models\AlertaStock;
 use App\Mail\OrderStatusMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -227,6 +228,19 @@ class PedidoController extends Controller
         ]);
     }
 
+    public function pedidosLogistica()
+    {
+        $pedidos = Pedido::with(['detalles.producto', 'cliente.usuario'])
+            ->whereIn('estado', ['confirmado', 'preparacion', 'enviado', 'entregado'])
+            ->orderBy('fecha_pedido', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $pedidos
+        ]);
+    }
+
     public function catalogo()
     {
         // Traemos productos con stock mayor a 0 (No hay columna estado, asi que la quitamos)
@@ -312,7 +326,7 @@ class PedidoController extends Controller
                 $detalle['producto']->save();
 
                 // --- NUEVA LÍNEA: VERIFICAMOS EL STOCK LUEGO DE GUARDAR ---
-                \App\Models\AlertaStock::verificarStock($detalle['producto']);
+                AlertaStock::verificarStock($detalle['producto']);
             }
 
             DB::commit();

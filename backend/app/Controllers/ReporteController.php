@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 use App\Models\Venta;
 use App\Models\Producto;
 use App\Models\OrdenProduccion;
@@ -11,16 +12,18 @@ use App\Models\MovimientoInventario;
 
 class ReporteController extends Controller
 {
-    private function verificarAdmin(Request $request) {
-        $user = \App\Models\User::find($request->header('X-User-Id'));
+    private function verificarAdmin(Request $request): ?\Illuminate\Http\JsonResponse {
+        $user = User::find($request->header('X-User-Id'));
         if (!$user || $user->rol !== 'admin') {
-            abort(403, 'Acceso denegado. Solo administradores.');
+            return response()->json(['success' => false, 'message' => 'Acceso denegado. Solo administradores.'], 403);
         }
+        return null;
     }
 
     public function ventas(Request $request)
     {
-        $this->verificarAdmin($request);
+        $auth = $this->verificarAdmin($request);
+        if ($auth) return $auth;
         
         $inicio = $request->inicio . ' 00:00:00';
         $fin = $request->fin . ' 23:59:59';
@@ -64,7 +67,8 @@ class ReporteController extends Controller
 
     public function inventario(Request $request)
     {
-        $this->verificarAdmin($request);
+        $auth = $this->verificarAdmin($request);
+        if ($auth) return $auth;
 
         $inicio = $request->inicio . ' 00:00:00';
         $fin = $request->fin . ' 23:59:59';
@@ -91,7 +95,8 @@ class ReporteController extends Controller
 
     public function produccion(Request $request)
     {
-        $this->verificarAdmin($request);
+        $auth = $this->verificarAdmin($request);
+        if ($auth) return $auth;
 
         $inicio = $request->inicio . ' 00:00:00';
         $fin = $request->fin . ' 23:59:59';

@@ -12,7 +12,6 @@ import GestionPedidosPage from './pages/GestionPedidosPage';
 import LogisticaPage from './pages/LogisticaPage';
 import NotificacionesPage from './pages/NotificacionesPage';
 import DashboardLayout from './components/DashboardLayout';
-import ProductDashboard from './components/ProductDashboard';
 import Ventas from './pages/Ventas';
 import MisVentasPage from './pages/MisVentasPage';
 import OrdenProduccionPage from './pages/OrdenProduccionPage';

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\AlertaStock;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AlertaStockController extends Controller
@@ -11,7 +12,7 @@ class AlertaStockController extends Controller
     public function index(Request $request)
     {
         // Seguridad: Solo permitimos ver esto a admin e inventario
-        $user = \App\Models\User::find($request->header('X-User-Id'));
+        $user = User::find($request->header('X-User-Id'));
         
         if ($user && !in_array($user->rol, ['admin', 'inventario'])) {
             return response()->json(['success' => false], 403);
