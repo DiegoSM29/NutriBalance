@@ -4,32 +4,40 @@ export default function ProductDashboard({
     productos, alertas, mensaje, loading, modoEdicion, form,
     fileInputRef, handleChange, handleFileChange, handleSubmit,
     iniciarEdicion, cancelarEdicion, handleEliminar, handleMarcarLeida,
-    activeTab, setActiveTab 
+    activeTab, setActiveTab,
+    movimientos, ajusteModal, abrirAjusteEntrada, abrirAjusteSalida,
+    cerrarAjusteModal, ajusteForm, handleAjusteChange, handleAjusteSubmit
 }) {
-    
-    // Separar las alertas activas del historial general
+
     const alertasActivas = alertas?.filter(a => !a.leida) || [];
     const historialAlertas = alertas?.filter(a => a.leida) || [];
 
     return (
         <div className="max-w-7xl mx-auto">
-            
-            {/* Cabecera y Pestañas */}
+
             <header className="mb-8 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 pb-0">
-                    <h1 className="text-2xl font-bold text-gray-800">Gestión de Inventario</h1>
-                    <p className="text-sm text-gray-500 mt-1">Administra los productos y monitorea las alertas de stock.</p>
-                    
+                    <h1 className="text-2xl font-bold text-gray-800">Gesti&oacute;n de Inventario</h1>
+                    <p className="text-sm text-gray-500 mt-1">Administra los productos, ajusta el stock y monitorea los movimientos.</p>
+
                     <div className="flex gap-6 mt-6 border-b border-gray-200">
-                        <button 
+                        <button
                             onClick={() => setActiveTab('catalogo')}
                             className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'catalogo' ? 'text-emerald-600' : 'text-gray-500 hover:text-gray-800'}`}
                         >
-                            <i className="bi bi-box-seam me-2"></i>Catálogo
+                            <i className="bi bi-box-seam me-2"></i>Cat&aacute;logo
                             {activeTab === 'catalogo' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-600 rounded-t-full"></span>}
                         </button>
-                        
-                        <button 
+
+                        <button
+                            onClick={() => setActiveTab('movimientos')}
+                            className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === 'movimientos' ? 'text-emerald-600' : 'text-gray-500 hover:text-gray-800'}`}
+                        >
+                            <i className="bi bi-arrow-left-right me-2"></i>Movimientos
+                            {activeTab === 'movimientos' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-600 rounded-t-full"></span>}
+                        </button>
+
+                        <button
                             onClick={() => setActiveTab('notificaciones')}
                             className={`pb-3 text-sm font-medium transition-colors relative flex items-center ${activeTab === 'notificaciones' ? 'text-emerald-600' : 'text-gray-500 hover:text-gray-800'}`}
                         >
@@ -55,7 +63,6 @@ export default function ProductDashboard({
             {/* PESTAÑA 1: CATÁLOGO */}
             {activeTab === 'catalogo' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Formulario de Creación / Edición */}
                     <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
                         <h2 className="text-lg font-semibold mb-4 text-gray-800">
                             {modoEdicion ? 'Editar Producto' : 'Registrar Producto'}
@@ -73,7 +80,7 @@ export default function ProductDashboard({
 
                             <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-600 mb-1">Categoría</label>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">Categor&iacute;a</label>
                                     <select name="categoria" className="w-full p-2 border rounded text-sm bg-white" value={form.categoria} onChange={handleChange}>
                                         <option value="Suplementos">Suplementos</option>
                                         <option value="Vitaminas">Vitaminas</option>
@@ -85,8 +92,8 @@ export default function ProductDashboard({
                                     <label className="block text-xs font-medium text-gray-600 mb-1">Tipo</label>
                                     <select name="tipo_producto" className="w-full p-2 border rounded text-sm bg-white" value={form.tipo_producto} onChange={handleChange}>
                                         <option value="Polvo">Polvo</option>
-                                        <option value="Capsulas">Cápsulas</option>
-                                        <option value="Liquido">Líquido</option>
+                                        <option value="Capsulas">C&aacute;psulas</option>
+                                        <option value="Liquido">L&iacute;quido</option>
                                         <option value="Snack">Snack</option>
                                     </select>
                                 </div>
@@ -103,7 +110,7 @@ export default function ProductDashboard({
                                     <input name="stock_actual" type="number" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.stock_actual} onChange={handleChange} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-600 mb-1">Stock Mínimo</label>
+                                    <label className="block text-xs font-medium text-gray-600 mb-1">Stock M&iacute;nimo</label>
                                     <input name="stock_minimo" type="number" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.stock_minimo} onChange={handleChange} />
                                 </div>
                             </div>
@@ -121,9 +128,8 @@ export default function ProductDashboard({
                         </form>
                     </div>
 
-                    {/* Tabla de Productos */}
                     <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h2 className="text-lg font-semibold mb-4 text-gray-800">Catálogo Actual</h2>
+                        <h2 className="text-lg font-semibold mb-4 text-gray-800">Cat&aacute;logo Actual</h2>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
@@ -165,13 +171,21 @@ export default function ProductDashboard({
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="p-3 text-center space-x-2">
-                                                    <button onClick={() => iniciarEdicion(p)} className="text-blue-500 hover:text-blue-700 p-1 transition-colors" title="Editar producto">
-                                                        <i className="bi bi-pencil-square"></i>
-                                                    </button>
-                                                    <button onClick={() => handleEliminar(p.id_producto, p.nombre)} className="text-red-500 hover:text-red-700 p-1 transition-colors" title="Eliminar producto">
-                                                        <i className="bi bi-trash"></i>
-                                                    </button>
+                                                <td className="p-3 text-center">
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <button onClick={() => abrirAjusteEntrada(p)} className="text-emerald-500 hover:text-emerald-700 p-1 transition-colors" title="Añadir stock">
+                                                            <i className="bi bi-plus-circle"></i>
+                                                        </button>
+                                                        <button onClick={() => abrirAjusteSalida(p)} className="text-orange-500 hover:text-orange-700 p-1 transition-colors" title="Retirar stock">
+                                                            <i className="bi bi-dash-circle"></i>
+                                                        </button>
+                                                        <button onClick={() => iniciarEdicion(p)} className="text-blue-500 hover:text-blue-700 p-1 transition-colors" title="Editar producto">
+                                                            <i className="bi bi-pencil-square"></i>
+                                                        </button>
+                                                        <button onClick={() => handleEliminar(p.id_producto, p.nombre)} className="text-red-500 hover:text-red-700 p-1 transition-colors" title="Eliminar producto">
+                                                            <i className="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
@@ -183,16 +197,60 @@ export default function ProductDashboard({
                 </div>
             )}
 
-            {/* PESTAÑA 2: NOTIFICACIONES E HISTORIAL */}
+            {/* PESTAÑA 2: MOVIMIENTOS */}
+            {activeTab === 'movimientos' && (
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i className="bi bi-arrow-left-right text-gray-500"></i> Historial de Movimientos
+                    </h2>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-gray-50 text-gray-600 text-sm border-y border-gray-200">
+                                    <th className="p-3 font-medium">Fecha</th>
+                                    <th className="p-3 font-medium">Producto</th>
+                                    <th className="p-3 font-medium text-center">Tipo</th>
+                                    <th className="p-3 font-medium text-center">Cantidad</th>
+                                    <th className="p-3 font-medium">Motivo</th>
+                                    <th className="p-3 font-medium">Registrado por</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {movimientos.length === 0 ? (
+                                    <tr><td colSpan="6" className="p-4 text-center text-gray-500 text-sm">No hay movimientos registrados.</td></tr>
+                                ) : (
+                                    movimientos.map(m => (
+                                        <tr key={m.id_movimiento} className="border-b border-gray-100 text-sm hover:bg-gray-50">
+                                            <td className="p-3 text-gray-500 whitespace-nowrap">{new Date(m.fecha).toLocaleString('es-BO')}</td>
+                                            <td className="p-3 font-medium text-gray-800">{m.producto?.nombre || 'Producto #' + m.id_producto}</td>
+                                            <td className="p-3 text-center">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${m.tipo_movimiento === 'ENTRADA' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                                    {m.tipo_movimiento === 'ENTRADA' ? 'ENTRADA' : 'SALIDA'}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-center font-medium">{m.cantidad}</td>
+                                            <td className="p-3 text-gray-600 max-w-xs truncate">{m.motivo}</td>
+                                            <td className="p-3 text-gray-500">{m.usuario?.nombre ? m.usuario.nombre + ' ' + (m.usuario.apellido || '') : 'Usuario #' + m.id_usuario}</td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-3 text-right">&Uacute;ltimos 100 movimientos</p>
+                </div>
+            )}
+
+            {/* PESTAÑA 3: NOTIFICACIONES E HISTORIAL */}
             {activeTab === 'notificaciones' && (
                 <div className="space-y-8">
-                    
-                    {/* Alertas Pendientes */}
+
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <i className="bi bi-exclamation-triangle-fill text-red-500"></i> Alertas Pendientes
                         </h2>
-                        
+
                         {alertasActivas.length === 0 ? (
                             <p className="text-gray-500 text-sm border border-dashed border-gray-200 p-6 text-center rounded-lg">
                                 <i className="bi bi-check2-circle text-2xl text-emerald-500 mb-2 block"></i>
@@ -205,17 +263,17 @@ export default function ProductDashboard({
                                         <div>
                                             <p className="font-bold text-red-800">{alerta.producto?.nombre}</p>
                                             <p className="text-sm text-red-700 mt-1">
-                                                Stock actual: <span className="font-bold">{alerta.stock_registrado}</span> 
-                                                <span className="text-red-400 text-xs ml-1">(Mínimo: {alerta.producto?.stock_minimo})</span>
+                                                Stock actual: <span className="font-bold">{alerta.stock_registrado}</span>
+                                                <span className="text-red-400 text-xs ml-1">(M&iacute;nimo: {alerta.producto?.stock_minimo})</span>
                                             </p>
                                             <p className="text-[10px] text-red-500 mt-2 flex items-center gap-1">
                                                 <i className="bi bi-clock"></i>
                                                 {new Date(alerta.fecha_alerta).toLocaleString('es-BO')}
                                             </p>
                                         </div>
-                                        <button 
-                                            onClick={() => handleMarcarLeida(alerta.id_alerta)} 
-                                            className="text-red-300 hover:text-emerald-600 transition-colors p-1" 
+                                        <button
+                                            onClick={() => handleMarcarLeida(alerta.id_alerta)}
+                                            className="text-red-300 hover:text-emerald-600 transition-colors p-1"
                                             title="Marcar como resuelto"
                                         >
                                             <i className="bi bi-check-circle-fill text-xl"></i>
@@ -226,12 +284,11 @@ export default function ProductDashboard({
                         )}
                     </div>
 
-                    {/* Historial de Alertas */}
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                             <i className="bi bi-clock-history text-gray-500"></i> Historial de Notificaciones
                         </h2>
-                        
+
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
@@ -262,6 +319,64 @@ export default function ProductDashboard({
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL DE AJUSTE DE STOCK */}
+            {ajusteModal.visible && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold text-gray-800">
+                                {ajusteModal.tipo === 'entrada' ? 'Añadir Stock' : 'Retirar Stock'}
+                            </h3>
+                            <button onClick={cerrarAjusteModal} className="text-gray-400 hover:text-gray-600 transition-colors">
+                                <i className="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+
+                        <p className="text-sm text-gray-600 mb-4">
+                            Producto: <span className="font-semibold text-gray-800">{ajusteModal.producto?.nombre}</span>
+                            <br />
+                            Stock actual: <span className="font-semibold">{ajusteModal.producto?.stock_actual}</span>
+                        </p>
+
+                        <form onSubmit={handleAjusteSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">Cantidad</label>
+                                <input
+                                    name="cantidad"
+                                    type="number"
+                                    min="1"
+                                    required
+                                    className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                                    value={ajusteForm.cantidad}
+                                    onChange={handleAjusteChange}
+                                    autoFocus
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">Motivo</label>
+                                <textarea
+                                    name="motivo"
+                                    required
+                                    rows="2"
+                                    className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none resize-none"
+                                    value={ajusteForm.motivo}
+                                    onChange={handleAjusteChange}
+                                    placeholder={ajusteModal.tipo === 'entrada' ? 'Ej: Compra a proveedor, devolución...' : 'Ej: Ajuste manual, merma, robo...'}
+                                />
+                            </div>
+                            <div className="flex gap-2 pt-2">
+                                <button type="button" onClick={cerrarAjusteModal} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 rounded transition-colors text-sm">
+                                    Cancelar
+                                </button>
+                                <button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded transition-colors text-sm">
+                                    {ajusteModal.tipo === 'entrada' ? 'Añadir' : 'Retirar'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

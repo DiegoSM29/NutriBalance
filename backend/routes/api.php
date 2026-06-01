@@ -8,6 +8,7 @@ use App\Controllers\PedidoController;
 use App\Controllers\ProductoController;
 use App\Controllers\VentaController;
 use App\Controllers\AlertaStockController;
+use App\Controllers\MovimientoInventarioController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -36,3 +37,7 @@ Route::get('/productos/disponibles', [ProductoController::class, 'disponibles'])
 
 Route::get('/alertas', [AlertaStockController::class, 'index']);
 Route::put('/alertas/{id}/leer', [AlertaStockController::class, 'marcarLeida']);
+
+Route::get('/movimientos', [MovimientoInventarioController::class, 'index']);
+Route::post('/movimientos/entrada', [MovimientoInventarioController::class, 'entrada']);
+Route::post('/movimientos/salida', [MovimientoInventarioController::class, 'salida']);

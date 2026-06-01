@@ -6,6 +6,7 @@ use App\Models\Producto;
 use App\Models\Pedido;
 use App\Models\DetallePedido;
 use App\Models\Cliente;
+use App\Models\MovimientoInventario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -47,6 +48,15 @@ class PedidoController extends Controller
                 foreach ($pedido->detalles as $detalle) {
                     Producto::where('id_producto', $detalle->id_producto)
                         ->increment('stock_actual', $detalle->cantidad);
+
+                    MovimientoInventario::create([
+                        'id_producto' => $detalle->id_producto,
+                        'id_usuario' => $pedido->cliente->id_usuario ?? 0,
+                        'tipo_movimiento' => 'ENTRADA',
+                        'cantidad' => $detalle->cantidad,
+                        'motivo' => 'Devolucion por pedido rechazado #' . $pedido->id_pedido,
+                        'fecha' => now(),
+                    ]);
                 }
 
                 DetallePedido::where('id_pedido', $id)->delete();

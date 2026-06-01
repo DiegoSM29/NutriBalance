@@ -18,4 +18,14 @@ class MovimientoInventario extends Model
         'motivo',
         'fecha',
     ];
+
+    public function producto()
+    {
+        return $this->belongsTo(Producto::class, 'id_producto', 'id_producto');
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
+    }
 }
