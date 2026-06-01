@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import EmpresaPage from './pages/EmpresaPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ClientPage from './pages/ClientPage';
@@ -21,6 +22,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
 
             <Route element={<DashboardLayout />}>
+                <Route path="/empresa" element={<EmpresaPage />} />
                 <Route path="/perfil" element={<ProfilePage />} />
                 <Route path="/client" element={<ClientPage />} />
                 <Route path="/mis-pedidos" element={<MisPedidosPage />} />

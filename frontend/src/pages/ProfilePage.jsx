@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPerfil, updatePerfil, uploadFoto } from '../services/api';
 import Profile from '../components/Profile';
+import fondoBg from '../assets/fondo3.jfif';
 
 export default function ProfilePage() {
     const navigate = useNavigate();
@@ -166,26 +167,34 @@ export default function ProfilePage() {
     }
 
     return (
-        <Profile
-            form={form}
-            errors={errors}
-            mensaje={mensaje}
-            loading={loading}
-            uploadingFoto={uploadingFoto}
-            fotoPreview={fotoPreview}
-            foto={foto}
-            showCurrentPassword={showCurrentPassword}
-            showNewPassword={showNewPassword}
-            showConfirmPassword={showConfirmPassword}
-            esCliente={esCliente}
-            ultimaActualizacion={ultimaActualizacion}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            handleFotoChange={handleFotoChange}
-            handleUploadFoto={handleUploadFoto}
-            setShowCurrentPassword={setShowCurrentPassword}
-            setShowNewPassword={setShowNewPassword}
-            setShowConfirmPassword={setShowConfirmPassword}
-        />
+        <div
+            className="relative min-h-screen -m-4 md:-m-8 p-4 md:p-8"
+            style={{ backgroundImage: `url(${fondoBg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}
+        >
+            <div className="absolute inset-0 bg-black/30"></div>
+            <div className="relative z-10">
+                <Profile
+                    form={form}
+                    errors={errors}
+                    mensaje={mensaje}
+                    loading={loading}
+                    uploadingFoto={uploadingFoto}
+                    fotoPreview={fotoPreview}
+                    foto={foto}
+                    showCurrentPassword={showCurrentPassword}
+                    showNewPassword={showNewPassword}
+                    showConfirmPassword={showConfirmPassword}
+                    esCliente={esCliente}
+                    ultimaActualizacion={ultimaActualizacion}
+                    handleChange={handleChange}
+                    handleSubmit={handleSubmit}
+                    handleFotoChange={handleFotoChange}
+                    handleUploadFoto={handleUploadFoto}
+                    setShowCurrentPassword={setShowCurrentPassword}
+                    setShowNewPassword={setShowNewPassword}
+                    setShowConfirmPassword={setShowConfirmPassword}
+                />
+            </div>
+        </div>
     );
 }

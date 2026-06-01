@@ -18,7 +18,7 @@ const estadoIcon = {
     rechazado: 'bi-x-circle',
 };
 
-const filtros = [
+const filtrosBase = [
     { value: '', label: 'Todos', icon: 'bi-list' },
     { value: 'pendiente', label: 'Pendiente', icon: 'bi-clock-history' },
     { value: 'confirmado', label: 'Confirmado', icon: 'bi-check-circle' },
@@ -26,6 +26,9 @@ const filtros = [
 ];
 
 export default function GestionPedidos({ user, pedidos, loading, onActualizarEstado, pedidoExpandido, setPedidoExpandido, comprobanteUrl, filtroEstado, setFiltroEstado }) {
+    const esRolPedidos = user?.rol === 'pedidos';
+    const filtros = esRolPedidos ? filtrosBase.filter(f => f.value !== 'rechazado') : filtrosBase;
+
     const pedidosFiltrados = filtroEstado
         ? pedidos.filter(p => p.estado === filtroEstado)
         : pedidos;
