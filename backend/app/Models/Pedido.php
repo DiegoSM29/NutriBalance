@@ -28,4 +28,10 @@ class Pedido extends Model
     {
         return $this->hasMany(DetallePedido::class, 'id_pedido', 'id_pedido');
     }
+
+    public function historial()
+    {
+        return $this->hasMany(HistorialEstadoPedido::class, 'id_pedido', 'id_pedido')
+            ->orderBy('fecha_cambio', 'desc');
+    }
 }

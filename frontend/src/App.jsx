@@ -7,7 +7,10 @@ import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
 import ProductPage from './pages/ProductPage';
 import MisPedidosPage from './pages/MisPedidosPage';
+import MisFacturasPage from './pages/MisFacturasPage';
 import GestionPedidosPage from './pages/GestionPedidosPage';
+import LogisticaPage from './pages/LogisticaPage';
+import NotificacionesPage from './pages/NotificacionesPage';
 import DashboardLayout from './components/DashboardLayout';
 import ProductDashboard from './components/ProductDashboard';
 import Ventas from './pages/Ventas';
@@ -28,7 +31,10 @@ function App() {
                 <Route path="/perfil" element={<ProfilePage />} />
                 <Route path="/client" element={<ClientPage />} />
                 <Route path="/mis-pedidos" element={<MisPedidosPage />} />
+                <Route path="/mis-facturas" element={<MisFacturasPage />} />
                 <Route path="/pedidos" element={<GestionPedidosPage />} />
+                <Route path="/logistica" element={<LogisticaPage />} />
+                <Route path="/notificaciones" element={<NotificacionesPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/productos" element={<ProductPage />} />
                 <Route path="/produccion" element={<OrdenProduccionPage />} />

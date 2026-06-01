@@ -6,9 +6,13 @@ use App\Models\Producto;
 use App\Models\Pedido;
 use App\Models\DetallePedido;
 use App\Models\Cliente;
+use App\Models\HistorialEstadoPedido;
+use App\Models\Notificacion;
 use App\Models\MovimientoInventario;
+use App\Mail\OrderStatusMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class PedidoController extends Controller
@@ -25,23 +29,76 @@ class PedidoController extends Controller
         ]);
     }
 
+    public function pedidosLogistica(Request $request)
+    {
+        $estado = $request->query('estado', '');
+
+        $query = Pedido::with(['detalles.producto', 'cliente.usuario'])
+            ->whereIn('estado', ['confirmado', 'preparacion', 'enviado', 'entregado']);
+
+        if (!empty($estado)) {
+            $query->where('estado', $estado);
+        }
+
+        $pedidos = $query->orderBy('fecha_pedido', 'desc')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $pedidos
+        ]);
+    }
+
     public function actualizarEstado(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'estado' => 'required|in:pendiente,confirmado,preparacion,enviado,entregado,rechazado'
+            'estado' => 'required|in:pendiente,confirmado,preparacion,enviado,entregado,rechazado',
+            'observacion' => 'nullable|string|max:500',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $pedido = Pedido::with('detalles')->find($id);
+        $pedido = Pedido::with(['detalles', 'cliente.usuario'])->find($id);
 
         if (!$pedido) {
             return response()->json(['success' => false, 'message' => 'Pedido no encontrado.'], 404);
         }
 
-        if ($request->estado === 'rechazado') {
+        $nuevoEstado = $request->estado;
+        $estadoAnterior = $pedido->estado;
+
+        // Validar transiciones de estado para logística
+        $transicionesPermitidas = [
+            'confirmado' => ['preparacion'],
+            'preparacion' => ['enviado'],
+            'enviado' => ['entregado'],
+            'pendiente' => ['confirmado', 'rechazado'],
+        ];
+
+        if (isset($transicionesPermitidas[$estadoAnterior])) {
+            if (!in_array($nuevoEstado, $transicionesPermitidas[$estadoAnterior])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "No se puede cambiar de '{$estadoAnterior}' a '{$nuevoEstado}'. Transición no permitida."
+                ], 422);
+            }
+        } elseif (!in_array($estadoAnterior, ['pendiente', 'confirmado', 'preparacion', 'enviado'])) {
+            return response()->json([
+                'success' => false,
+                'message' => "El pedido está en estado '{$estadoAnterior}' y no puede modificarse."
+            ], 422);
+        }
+
+        // No permitir cambiar a "entregado" sin antes pasar por "enviado"
+        if ($nuevoEstado === 'entregado' && $estadoAnterior !== 'enviado') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Para marcar como entregado, el pedido debe estar en estado "enviado" primero.'
+            ], 422);
+        }
+
+        if ($nuevoEstado === 'rechazado') {
             try {
                 DB::beginTransaction();
 
@@ -77,13 +134,94 @@ class PedidoController extends Controller
             }
         }
 
-        $pedido->estado = $request->estado;
+        $pedido->estado = $nuevoEstado;
         $pedido->save();
+
+        // Registrar en el historial de cambios
+        $historial = HistorialEstadoPedido::create([
+            'id_pedido' => $pedido->id_pedido,
+            'estado_anterior' => $estadoAnterior,
+            'estado_nuevo' => $nuevoEstado,
+            'observacion' => $request->observacion,
+            'id_usuario' => $request->header('X-User-Id'),
+            'fecha_cambio' => now(),
+        ]);
+
+        // Crear notificación para el cliente
+        if ($pedido->cliente && $pedido->cliente->usuario) {
+            $titulo = 'Estado de pedido actualizado';
+            $mensaje = '';
+
+            switch ($nuevoEstado) {
+                case 'confirmado':
+                    $titulo = 'Pedido confirmado';
+                    $mensaje = "Tu pedido #{$pedido->id_pedido} ha sido confirmado. Pronto comenzaremos con la preparación.";
+                    break;
+                case 'preparacion':
+                    $titulo = 'Pedido en preparación';
+                    $mensaje = "Tu pedido #{$pedido->id_pedido} está siendo preparado.";
+                    break;
+                case 'enviado':
+                    $titulo = 'Pedido enviado';
+                    $mensaje = "Tu pedido #{$pedido->id_pedido} ha sido enviado. Estará pronto contigo.";
+                    break;
+                case 'entregado':
+                    $titulo = 'Pedido entregado';
+                    $mensaje = "Tu pedido #{$pedido->id_pedido} ha sido entregado con éxito. ¡Gracias por tu compra!";
+                    break;
+                case 'rechazado':
+                    $titulo = 'Pedido rechazado';
+                    $mensaje = "Tu pedido #{$pedido->id_pedido} ha sido rechazado. Si tienes dudas, contáctanos.";
+                    break;
+            }
+
+            if ($mensaje) {
+                Notificacion::create([
+                    'id_usuario' => $pedido->cliente->usuario->id_usuario,
+                    'titulo' => $titulo,
+                    'mensaje' => $mensaje,
+                    'tipo' => 'pedido',
+                    'id_referencia' => $pedido->id_pedido,
+                    'leida' => false,
+                    'fecha_creacion' => now(),
+                ]);
+            }
+        }
+
+        // Enviar notificación por correo si el estado es "enviado" o "entregado"
+        if (in_array($nuevoEstado, ['enviado', 'entregado']) && $pedido->cliente && $pedido->cliente->usuario) {
+            try {
+                Mail::to($pedido->cliente->usuario->correo)->send(
+                    new OrderStatusMail($pedido, $estadoAnterior, $nuevoEstado, $request->observacion)
+                );
+            } catch (\Exception $e) {
+                // No fallar si el correo no se puede enviar
+            }
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Estado del pedido actualizado a ' . $request->estado . '.',
+            'message' => 'Estado del pedido actualizado a ' . $nuevoEstado . '.',
             'data' => $pedido
+        ]);
+    }
+
+    public function historial($id)
+    {
+        $pedido = Pedido::find($id);
+
+        if (!$pedido) {
+            return response()->json(['success' => false, 'message' => 'Pedido no encontrado.'], 404);
+        }
+
+        $historial = HistorialEstadoPedido::with('usuario')
+            ->where('id_pedido', $id)
+            ->orderBy('fecha_cambio', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $historial
         ]);
     }
 
