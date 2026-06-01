@@ -327,3 +327,51 @@ export async function marcarAlertaLeida(id) {
     });
     return response.json();
 }
+
+// ÓRDENES DE PRODUCCIÓN
+export async function getOrdenesProduccion(estado = '') {
+    const query = estado ? `?estado=${estado}` : '';
+    const response = await fetch(`${API_URL}/ordenes-produccion${query}`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function crearOrdenProduccion(data) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/ordenes-produccion`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function getOrdenProduccion(id) {
+    const response = await fetch(`${API_URL}/ordenes-produccion/${id}`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function actualizarOrdenProduccion(id, data) {
+    const response = await fetch(`${API_URL}/ordenes-produccion/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}

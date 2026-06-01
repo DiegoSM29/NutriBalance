@@ -23,7 +23,7 @@ const menuItems = {
     ],
     produccion: [
         empresaItem,
-        { label: 'Producción', path: '/produccion', icon: 'bi-gear' },
+        { label: 'Órdenes de Producción', path: '/produccion', icon: 'bi-gear' },
         perfilItem,
     ],
     logistica: [
