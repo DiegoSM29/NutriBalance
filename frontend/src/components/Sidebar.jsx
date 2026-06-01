@@ -13,7 +13,8 @@ const menuItems = {
     ],
     ventas: [
         empresaItem,
-        { label: 'Ventas', path: '/ventas', icon: 'bi-cart' },
+        { label: 'Nueva Venta', path: '/ventas', icon: 'bi-cart-plus' },
+        { label: 'Mis Ventas', path: '/mis-ventas', icon: 'bi-receipt' },
         perfilItem,
     ],
     inventario: [
@@ -23,7 +24,7 @@ const menuItems = {
     ],
     produccion: [
         empresaItem,
-        { label: 'Producción', path: '/produccion', icon: 'bi-gear' },
+        { label: 'Órdenes de Producción', path: '/produccion', icon: 'bi-gear' },
         perfilItem,
     ],
     logistica: [
