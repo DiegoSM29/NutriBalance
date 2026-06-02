@@ -1,4 +1,4 @@
-import fondo from '../assets/fondo4.png';
+import fondo from '../assets/fondo4.webp';
 
 const estadoConfig = {
     planificada: { label: 'Planificada', icon: 'bi-calendar-check', class: 'bg-blue-50 text-blue-700 border-blue-200' },

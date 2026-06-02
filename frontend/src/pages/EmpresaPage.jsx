@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import fondoBg from '../assets/fondo2.jfif';
-import imgGranola from '../assets/granola.jpg';
-import imgBarras from '../assets/barras.jfif';
-import imgSuplemento from '../assets/suplemento.jfif';
-import imgBebidas from '../assets/bebidas.png';
+import fondoBg from '../assets/fondo2.webp';
+import imgGranola from '../assets/granola.webp';
+import imgBarras from '../assets/barras.webp';
+import imgSuplemento from '../assets/suplemento.webp';
+import imgBebidas from '../assets/bebidas.webp';
 
 const sections = [
     {

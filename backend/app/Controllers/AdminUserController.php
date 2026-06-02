@@ -44,7 +44,7 @@ class AdminUserController extends Controller
             return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
         }
 
-        $query = User::query();
+        $query = User::with('roles');
 
         if ($request->filled('rol')) {
             $query->where('rol', $request->rol);
@@ -59,7 +59,6 @@ class AdminUserController extends Controller
             });
         }
 
-        // OFUSCACIÓN AÑADIDA: Oculta el rol super-admin si quien consulta es un admin normal
         $usuarios = $query->get()->map(function($u) use ($admin) {
             if ($u->hasRole('super-admin') && !$admin->hasRole('super-admin')) {
                 $u->rol = 'admin'; 
@@ -99,7 +98,7 @@ class AdminUserController extends Controller
             'nombre'   => $request->nombre,
             'apellido' => $request->apellido,
             'correo'   => $request->correo,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'rol'      => $request->rol,
             'estado'   => true
         ]);
@@ -140,7 +139,7 @@ class AdminUserController extends Controller
             'nombre'   => $request->nombre,
             'apellido' => $request->apellido,
             'correo'   => $request->correo,
-            'password' => Hash::make('user123'),
+            'password' => 'user123',
             'rol'      => 'cliente',
             'estado'   => true,
         ]);

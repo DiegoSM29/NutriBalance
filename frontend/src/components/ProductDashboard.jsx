@@ -71,8 +71,8 @@ export default function ProductDashboard({
             {/* PESTAÑA 1: CATÁLOGO */}
             {activeTab === 'catalogo' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
-                    {/* Solo admin e inventario pueden ver el formulario de creación/edición */}
+
+                    {/* Solo admin e inventario pueden ver el formulario de creacion/edicion */}
                     {puedeModificar && (
                         <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
                             <h2 className="text-lg font-semibold mb-4 text-gray-800">
@@ -80,19 +80,19 @@ export default function ProductDashboard({
                             </h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-600 mb-1">Nombre</label>
-                                    <input name="nombre" type="text" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.nombre} onChange={handleChange} />
+                                    <label htmlFor="nombre" className="block text-xs font-medium text-gray-600 mb-1">Nombre</label>
+                                    <input id="nombre" name="nombre" type="text" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.nombre} onChange={handleChange} />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-600 mb-1">Imagen (Opcional)</label>
-                                    <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="w-full text-xs text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200" />
+                                    <label htmlFor="imagen" className="block text-xs font-medium text-gray-600 mb-1">Imagen (Opcional)</label>
+                                    <input id="imagen" type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="w-full text-xs text-gray-500 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200" />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-600 mb-1">Categoría</label>
-                                        <select name="categoria" className="w-full p-2 border rounded text-sm bg-white" value={form.categoria} onChange={handleChange}>
+                                        <label htmlFor="categoria" className="block text-xs font-medium text-gray-600 mb-1">Categoría</label>
+                                        <select id="categoria" name="categoria" className="w-full p-2 border rounded text-sm bg-white" value={form.categoria} onChange={handleChange}>
                                             <option value="Suplementos">Suplementos</option>
                                             <option value="Vitaminas">Vitaminas</option>
                                             <option value="Salud">Salud</option>
@@ -100,8 +100,8 @@ export default function ProductDashboard({
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-600 mb-1">Tipo</label>
-                                        <select name="tipo_producto" className="w-full p-2 border rounded text-sm bg-white" value={form.tipo_producto} onChange={handleChange}>
+                                        <label htmlFor="tipo_producto" className="block text-xs font-medium text-gray-600 mb-1">Tipo</label>
+                                        <select id="tipo_producto" name="tipo_producto" className="w-full p-2 border rounded text-sm bg-white" value={form.tipo_producto} onChange={handleChange}>
                                             <option value="Polvo">Polvo</option>
                                             <option value="Capsulas">Cápsulas</option>
                                             <option value="Liquido">Líquido</option>
@@ -113,19 +113,19 @@ export default function ProductDashboard({
                                 {/* Ocultamos el campo de precio al de inventario */}
                                 {mostrarPrecios && (
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-600 mb-1">Precio de Venta (Bs)</label>
-                                        <input name="precio_venta" type="number" step="0.10" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.precio_venta} onChange={handleChange} />
+                                        <label htmlFor="precio_venta" className="block text-xs font-medium text-gray-600 mb-1">Precio de Venta (Bs)</label>
+                                        <input id="precio_venta" name="precio_venta" type="number" step="0.10" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.precio_venta} onChange={handleChange} />
                                     </div>
                                 )}
 
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-600 mb-1">Stock Actual</label>
-                                        <input name="stock_actual" type="number" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.stock_actual} onChange={handleChange} />
+                                        <label htmlFor="stock_actual" className="block text-xs font-medium text-gray-600 mb-1">Stock Actual</label>
+                                        <input id="stock_actual" name="stock_actual" type="number" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.stock_actual} onChange={handleChange} />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-medium text-gray-600 mb-1">Stock Mínimo</label>
-                                        <input name="stock_minimo" type="number" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.stock_minimo} onChange={handleChange} />
+                                        <label htmlFor="stock_minimo" className="block text-xs font-medium text-gray-600 mb-1">Stock Mínimo</label>
+                                        <input id="stock_minimo" name="stock_minimo" type="number" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.stock_minimo} onChange={handleChange} />
                                     </div>
                                 </div>
 
@@ -380,12 +380,13 @@ export default function ProductDashboard({
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Motivo</label>
+                                <label htmlFor="motivoAjuste" className="block text-xs font-medium text-gray-600 mb-1">Motivo</label>
                                 <textarea
+                                    id="motivoAjuste"
                                     name="motivo"
                                     required
                                     rows="2"
-                                    className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none resize-none"
+                                    className="..."
                                     value={ajusteForm.motivo}
                                     onChange={handleAjusteChange}
                                     placeholder={ajusteModal.tipo === 'entrada' ? 'Ej: Compra a proveedor, devolución...' : 'Ej: Ajuste manual, merma, robo...'}

@@ -1,4 +1,5 @@
 const roleRoutes = {
+    'super-admin': ['/empresa', '/perfil', '/admin', '/productos', '/reportes'],
     admin: ['/empresa', '/perfil', '/admin', '/productos', '/reportes'],
     ventas: ['/empresa', '/perfil', '/ventas', '/mis-ventas'],
     inventario: ['/empresa', '/perfil', '/productos'],
