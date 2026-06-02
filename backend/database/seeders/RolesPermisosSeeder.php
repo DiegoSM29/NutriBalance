@@ -20,14 +20,15 @@ class RolesPermisosSeeder extends Seeder
 
         // Crear Super Admin y Admin
         $superAdmin = Role::create(['name' => 'super-admin']);
+        $superAdmin->givePermissionTo(Permission::all());
         $admin = Role::create(['name' => 'admin']);
         $admin->givePermissionTo(Permission::all());
 
-        // Crear Vendedor
-        $vendedor = Role::create(['name' => 'vendedor']);
-        $vendedor->givePermissionTo(['ver_precios']);
+        // Crear Ventas
+        $ventas = Role::create(['name' => 'ventas']);
+        $ventas->givePermissionTo(['ver_precios']);
 
-        // Crear Encargado Inventario
+        // Crear Inventario
         $inventario = Role::create(['name' => 'inventario']);
         $inventario->givePermissionTo(['modificar_inventario', 'ver_insumos_productos']);
 
@@ -38,6 +39,14 @@ class RolesPermisosSeeder extends Seeder
         // Crear Logistica
         $logistica = Role::create(['name' => 'logistica']);
         $logistica->givePermissionTo(['ver_pedidos', 'actualizar_estado_pedidos']);
+
+        // Crear Pedidos
+        $pedidos = Role::create(['name' => 'pedidos']);
+        $pedidos->givePermissionTo(['ver_pedidos', 'actualizar_estado_pedidos']);
+
+        // Crear Cliente
+        $cliente = Role::create(['name' => 'cliente']);
+        $cliente->givePermissionTo(['ver_precios']);
     }
 }
 
