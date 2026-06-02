@@ -198,10 +198,14 @@ export async function getAdminProductos() {
 }
 
 export async function crearAdminProducto(formData) {
+    const user = JSON.parse(localStorage.getItem('user'));
 
     const response = await fetch(`${API_URL}/admin/productos`, {
         method: 'POST',
-        headers: { 'Accept': 'application/json' },
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
         body: formData,
     });
     const json = await response.json();
@@ -210,11 +214,15 @@ export async function crearAdminProducto(formData) {
 }
 
 export async function actualizarAdminProducto(id, formData) {
+    const user = JSON.parse(localStorage.getItem('user'));
 
     formData.append('_method', 'PUT'); 
     const response = await fetch(`${API_URL}/admin/productos/${id}`, {
         method: 'POST',
-        headers: { 'Accept': 'application/json' },
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
         body: formData,
     });
     const json = await response.json();
@@ -223,9 +231,14 @@ export async function actualizarAdminProducto(id, formData) {
 }
 
 export async function eliminarAdminProducto(id) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
     const response = await fetch(`${API_URL}/admin/productos/${id}`, {
         method: 'DELETE',
-        headers: { 'Accept': 'application/json' },
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
     });
     const json = await response.json();
     if (!response.ok) throw json;
@@ -372,10 +385,14 @@ export async function marcarAlertaLeida(id) {
 }
 
 export async function getOrdenesProduccion(estado = '') {
+    const user = JSON.parse(localStorage.getItem('user'));
     const query = estado ? `?estado=${estado}` : '';
     const response = await fetch(`${API_URL}/ordenes-produccion${query}`, {
         method: 'GET',
-        headers: { 'Accept': 'application/json' },
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
     });
     return response.json();
 }
@@ -405,11 +422,13 @@ export async function getOrdenProduccion(id) {
 }
 
 export async function actualizarOrdenProduccion(id, data) {
+    const user = JSON.parse(localStorage.getItem('user'));
     const response = await fetch(`${API_URL}/ordenes-produccion/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
         },
         body: JSON.stringify(data),
     });

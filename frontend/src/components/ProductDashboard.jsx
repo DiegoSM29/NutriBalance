@@ -110,13 +110,10 @@ export default function ProductDashboard({
                                     </div>
                                 </div>
 
-                                {/* Ocultamos el campo de precio al de inventario */}
-                                {mostrarPrecios && (
-                                    <div>
-                                        <label htmlFor="precio_venta" className="block text-xs font-medium text-gray-600 mb-1">Precio de Venta (Bs)</label>
-                                        <input id="precio_venta" name="precio_venta" type="number" step="0.10" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.precio_venta} onChange={handleChange} />
-                                    </div>
-                                )}
+                                <div>
+                                    <label htmlFor="precio_venta" className="block text-xs font-medium text-gray-600 mb-1">Precio de Venta (Bs)</label>
+                                    <input id="precio_venta" name="precio_venta" type="number" step="0.10" min="0" required className="w-full p-2 border rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none" value={form.precio_venta} onChange={handleChange} />
+                                </div>
 
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
