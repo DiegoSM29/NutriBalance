@@ -38,8 +38,7 @@ export default function DashboardLayout() {
 
             <div className="lg:ml-64">
                 <header className="lg:hidden bg-white border-b px-4 h-14 flex items-center justify-between shadow-sm">
-                    <button onClick={() => setSidebarOpen(true)} className="text-gray-600 text-xl">
-                        <i className="bi bi-list"></i>
+                    <button onClick={() => setSidebarOpen(true)} aria-label="Abrir menú" className="text-gray-600 text-xl">                        <i className="bi bi-list"></i>
                     </button>
                     <span className="font-semibold text-gray-800">NutriBalance</span>
                     <div className="w-8"></div>

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPerfil, updatePerfil, uploadFoto } from '../services/api';
 import Profile from '../components/Profile';
-import fondoBg from '../assets/fondo3.jfif';
+import fondoBg from '../assets/fondo3.webp';
 
 export default function ProfilePage() {
     const navigate = useNavigate();
