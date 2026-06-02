@@ -12,7 +12,6 @@ export default function DashboardLayout() {
     } catch {
         user = null;
     }
-
     if (!user) {
         return <Navigate to="/login" replace />;
     }

@@ -12,13 +12,13 @@ return new class extends Migration
         Schema::create('orden_produccion', function (Blueprint $table) {
             $table->id('id_orden');
             $table->string('numero_orden', 20)->unique();
-            $table->integer('id_producto');
+            $table->unsignedBigInteger('id_producto');
             $table->foreign('id_producto')->references('id_producto')->on('productos');
             $table->integer('cantidad');
             $table->date('fecha_planificada');
             $table->dateTime('fecha_creacion')->nullable();
             $table->string('estado', 20)->default('planificada');
-            $table->integer('id_usuario')->nullable();
+            $table->unsignedBigInteger('id_usuario')->nullable();
             $table->foreign('id_usuario')->references('id_usuario')->on('usuarios');
         });
     }

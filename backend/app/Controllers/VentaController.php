@@ -18,7 +18,7 @@ class VentaController extends Controller
   {
     $user = User::find($request->id_usuario);
 
-    if (!$user || $user->rol !== 'ventas') {
+    if (!$user || !in_array($user->rol, ['ventas', 'admin', 'super-admin'])) {
 
       return response()->json([
         'success' => false,

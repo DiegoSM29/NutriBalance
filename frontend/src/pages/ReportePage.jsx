@@ -27,7 +27,7 @@ export default function ReportePage() {
     };
 
     useEffect(() => {
-        if (!user || user.rol !== 'admin') {
+        if (!user || !['admin', 'super-admin'].includes(user.rol)) {
             navigate('/login');
         }
     }, [user, navigate]);

@@ -3,14 +3,27 @@
 namespace App\Controllers;
 
 use App\Models\OrdenProduccion;
-use App\Models\Producto;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class OrdenProduccionController extends Controller
 {
+    private function verificarPermiso(Request $request)
+    {
+        $user = User::find($request->header('X-User-Id'));
+        if (!$user || !in_array($user->rol, ['super-admin', 'admin', 'produccion'])) {
+            return false;
+        }
+        return true;
+    }
+
     public function index(Request $request)
     {
+        if (!$this->verificarPermiso($request)) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
         $query = OrdenProduccion::with(['producto', 'usuario']);
 
         if ($request->has('estado') && $request->estado !== '') {
@@ -27,6 +40,10 @@ class OrdenProduccionController extends Controller
 
     public function store(Request $request)
     {
+        if (!$this->verificarPermiso($request)) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'id_producto' => 'required|exists:productos,id_producto',
             'cantidad' => 'required|integer|min:1',
@@ -38,9 +55,9 @@ class OrdenProduccionController extends Controller
         }
 
         $id_usuario = $request->header('X-User-Id');
-
         $year = date('Y');
         $month = date('m');
+        
         $lastOrder = OrdenProduccion::whereYear('fecha_creacion', $year)
             ->whereMonth('fecha_creacion', $month)
             ->orderBy('id_orden', 'desc')
@@ -53,10 +70,8 @@ class OrdenProduccionController extends Controller
             $newNumber = '0001';
         }
 
-        $numero_orden = 'OP-' . $year . $month . '-' . $newNumber;
-
         $orden = OrdenProduccion::create([
-            'numero_orden' => $numero_orden,
+            'numero_orden' => 'OP-' . $year . $month . '-' . $newNumber,
             'id_producto' => $request->id_producto,
             'cantidad' => $request->cantidad,
             'fecha_planificada' => $request->fecha_planificada,
@@ -74,7 +89,7 @@ class OrdenProduccionController extends Controller
         ], 201);
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         $orden = OrdenProduccion::with(['producto', 'usuario'])->find($id);
 
@@ -88,8 +103,12 @@ class OrdenProduccionController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
+        if (!$this->verificarPermiso($request)) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
         $orden = OrdenProduccion::find($id);
 
         if (!$orden) {
@@ -106,15 +125,9 @@ class OrdenProduccionController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        if ($request->has('fecha_planificada')) {
-            $orden->fecha_planificada = $request->fecha_planificada;
-        }
-        if ($request->has('cantidad')) {
-            $orden->cantidad = $request->cantidad;
-        }
-        if ($request->has('estado')) {
-            $orden->estado = $request->estado;
-        }
+        if ($request->has('fecha_planificada')) $orden->fecha_planificada = $request->fecha_planificada;
+        if ($request->has('cantidad')) $orden->cantidad = $request->cantidad;
+        if ($request->has('estado')) $orden->estado = $request->estado;
 
         $orden->save();
         $orden->load(['producto', 'usuario']);

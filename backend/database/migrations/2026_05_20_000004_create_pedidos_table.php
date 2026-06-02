@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('pedidos')) return;
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id('id_pedido');
-            $table->integer('id_cliente');
+            $table->unsignedBigInteger('id_cliente');
             $table->foreign('id_cliente')->references('id_cliente')->on('clientes');
             $table->dateTime('fecha_pedido');
             $table->date('fecha_entrega')->nullable();

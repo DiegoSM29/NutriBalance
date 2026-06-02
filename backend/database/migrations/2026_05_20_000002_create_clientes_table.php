@@ -11,7 +11,7 @@ return new class extends Migration
         if (Schema::hasTable('clientes')) return;
         Schema::create('clientes', function (Blueprint $table) {
             $table->id('id_cliente');
-            $table->integer('id_usuario');
+            $table->unsignedBigInteger('id_usuario');
             $table->foreign('id_usuario')->references('id_usuario')->on('usuarios');
             $table->string('telefono', 16)->nullable();
             $table->string('direccion', 40)->nullable();

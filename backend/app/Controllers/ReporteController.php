@@ -14,7 +14,7 @@ class ReporteController extends Controller
 {
     private function verificarAdmin(Request $request): ?\Illuminate\Http\JsonResponse {
         $user = User::find($request->header('X-User-Id'));
-        if (!$user || $user->rol !== 'admin') {
+        if (!$user || !in_array($user->rol, ['admin', 'super-admin'])) {
             return response()->json(['success' => false, 'message' => 'Acceso denegado. Solo administradores.'], 403);
         }
         return null;

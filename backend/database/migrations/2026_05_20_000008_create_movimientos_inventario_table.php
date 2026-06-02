@@ -11,9 +11,9 @@ return new class extends Migration
         if (Schema::hasTable('movimientos_inventario')) return;
         Schema::create('movimientos_inventario', function (Blueprint $table) {
             $table->id('id_movimiento');
-            $table->integer('id_producto');
+            $table->unsignedBigInteger('id_producto');
             $table->foreign('id_producto')->references('id_producto')->on('productos');
-            $table->integer('id_usuario');
+            $table->unsignedBigInteger('id_usuario');
             $table->foreign('id_usuario')->references('id_usuario')->on('usuarios');
             $table->string('tipo_movimiento', 20);
             $table->integer('cantidad');

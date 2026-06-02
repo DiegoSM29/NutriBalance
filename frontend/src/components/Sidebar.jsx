@@ -5,6 +5,13 @@ const empresaItem = { label: 'Empresa', path: '/empresa', icon: 'bi-building' };
 const perfilItem = { label: 'Mi Perfil', path: '/perfil', icon: 'bi-person-circle' };
 
 const menuItems = {
+    'super-admin': [
+        empresaItem,
+        { label: 'Usuarios', path: '/admin', icon: 'bi-people' },
+        { label: 'Productos', path: '/productos', icon: 'bi-box-seam' },
+        { label: 'Reportes y BI', path: '/reportes', icon: 'bi-graph-up' },
+        perfilItem,
+    ],
     admin: [
         empresaItem,
         { label: 'Usuarios', path: '/admin', icon: 'bi-people' },
@@ -49,6 +56,7 @@ const menuItems = {
 };
 
 const roleLabels = {
+    'super-admin': 'Super Administrador',
     admin: 'Administrador',
     ventas: 'Ventas',
     inventario: 'Inventario',

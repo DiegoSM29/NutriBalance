@@ -11,9 +11,9 @@ return new class extends Migration
         if (Schema::hasTable('ventas')) return;
         Schema::create('ventas', function (Blueprint $table) {
             $table->id('id_venta');
-            $table->integer('id_cliente');
+            $table->unsignedBigInteger('id_cliente');
             $table->foreign('id_cliente')->references('id_cliente')->on('clientes');
-            $table->integer('id_usuario');
+            $table->unsignedBigInteger('id_usuario');
             $table->foreign('id_usuario')->references('id_usuario')->on('usuarios');
             $table->dateTime('fecha_venta');
             $table->decimal('total', 10, 2);

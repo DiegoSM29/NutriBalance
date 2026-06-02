@@ -2,17 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['nombre', 'apellido', 'correo', 'password', 'rol', 'estado', 'foto', 'ultima_actualizacion'])]
-#[Hidden(['password'])]
 class User extends Authenticatable
 {
+    use Notifiable, HasRoles;
+
     protected $table = 'usuarios';
     protected $primaryKey = 'id_usuario';
     public $timestamps = false;
+
+    protected $fillable = [
+        'nombre', 
+        'apellido', 
+        'correo', 
+        'password', 
+        'rol', 
+        'estado', 
+        'foto', 
+        'ultima_actualizacion'
+    ];
+
+    // Oculta el password para que nunca viaje al frontend accidentalmente
+    protected $hidden = [
+        'password',
+    ];
 
     protected function casts(): array
     {

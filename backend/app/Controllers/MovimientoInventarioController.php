@@ -16,7 +16,7 @@ class MovimientoInventarioController extends Controller
     {
         $user = User::find($request->header('X-User-Id'));
 
-        if ($user && !in_array($user->rol, ['admin', 'inventario'])) {
+        if ($user && !in_array($user->rol, ['admin', 'inventario', 'super-admin'])) {
             return response()->json(['success' => false], 403);
         }
 
@@ -35,7 +35,7 @@ class MovimientoInventarioController extends Controller
     {
         $user = User::find($request->header('X-User-Id'));
 
-        if ($user && !in_array($user->rol, ['admin', 'inventario'])) {
+        if ($user && !in_array($user->rol, ['admin', 'inventario', 'super-admin'])) {
             return response()->json(['success' => false], 403);
         }
 
@@ -88,7 +88,7 @@ class MovimientoInventarioController extends Controller
     {
         $user = User::find($request->header('X-User-Id'));
 
-        if ($user && !in_array($user->rol, ['admin', 'inventario'])) {
+        if ($user && !in_array($user->rol, ['admin', 'inventario', 'super-admin'])) {
             return response()->json(['success' => false], 403);
         }
 

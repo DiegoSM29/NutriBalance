@@ -6,28 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         if (Schema::hasTable('alertas_stock')) return;
         Schema::create('alertas_stock', function (Blueprint $table) {
             $table->id('id_alerta');
-            
-            // Forzamos a que sea un entero normal para que coincida con tu tabla productos
-            $table->integer('id_producto'); 
+            $table->unsignedBigInteger('id_producto');
             $table->foreign('id_producto')->references('id_producto')->on('productos');
-            
             $table->integer('stock_registrado'); 
             $table->boolean('leida')->default(false);
             $table->timestamp('fecha_alerta')->useCurrent();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('alertas_stock');

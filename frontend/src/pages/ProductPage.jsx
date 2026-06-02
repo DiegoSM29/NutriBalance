@@ -219,6 +219,7 @@ export default function ProductPage() {
 
     return (
         <ProductDashboard
+            user={usuarioActual}
             productos={productos}
             alertas={alertas}
             movimientos={movimientos}

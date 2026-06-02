@@ -74,57 +74,56 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'correo' => 'required|email',
-        'password' => 'required|string',
-    ], [
-        'correo.required' => 'El correo electrónico es obligatorio.',
-        'correo.email' => 'Ingrese un correo válido.',
-        'password.required' => 'La contraseña es obligatoria.',
-    ]);
+  public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'correo' => 'required|email',
+            'password' => 'required|string',
+        ], [
+            'correo.required' => 'El correo electrónico es obligatorio.',
+            'correo.email' => 'Ingrese un correo válido.',
+            'password.required' => 'La contraseña es obligatoria.',
+        ]);
 
-    if ($validator->fails()) {
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $user = User::where('correo', $request->correo)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Credenciales incorrectas.',
+            ], 401);
+        }
+
+        if (!$user->estado) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La cuenta está deshabilitada.',
+            ], 403);
+        }
+
+        $rolReal = $user->getRoleNames()->first() ?? $user->rol;
 
         return response()->json([
-            'success' => false,
-            'message' => 'Error de validación',
-            'errors' => $validator->errors(),
-        ], 422);
-    }
-
-    $user = User::where('correo', $request->correo)->first();
-
-    if (!$user || !Hash::check($request->password, $user->password)) {
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Credenciales incorrectas.',
-        ], 401);
-    }
-
-    if (!$user->estado) {
-
-        return response()->json([
-            'success' => false,
-            'message' => 'La cuenta está deshabilitada.',
-        ], 403);
-    }
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Inicio de sesión exitoso.',
-        'data' => [
-            'usuario' => [
-                'id_usuario' => $user->id_usuario,
-                'nombre' => $user->nombre,
-                'apellido' => $user->apellido,
-                'correo' => $user->correo,
-                'rol' => $user->rol,
-                'foto' => $user->foto,
+            'success' => true,
+            'message' => 'Inicio de sesión exitoso.',
+            'data' => [
+                'usuario' => [
+                    'id_usuario' => $user->id_usuario,
+                    'nombre' => $user->nombre,
+                    'apellido' => $user->apellido,
+                    'correo' => $user->correo,
+                    'rol' => $rolReal, 
+                    'foto' => $user->foto,
+                ]
             ]
-        ]
-    ]);
-}
+        ]);
+    }
 }

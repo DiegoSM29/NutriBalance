@@ -11,9 +11,9 @@ return new class extends Migration
         if (Schema::hasTable('detalle_venta')) return;
         Schema::create('detalle_venta', function (Blueprint $table) {
             $table->id('id_detalle');
-            $table->integer('id_venta');
+            $table->unsignedBigInteger('id_venta');
             $table->foreign('id_venta')->references('id_venta')->on('ventas');
-            $table->integer('id_producto');
+            $table->unsignedBigInteger('id_producto');
             $table->foreign('id_producto')->references('id_producto')->on('productos');
             $table->integer('cantidad');
             $table->decimal('precio_unitario', 10, 2);

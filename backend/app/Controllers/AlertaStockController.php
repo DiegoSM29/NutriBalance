@@ -14,7 +14,7 @@ class AlertaStockController extends Controller
         // Seguridad: Solo permitimos ver esto a admin e inventario
         $user = User::find($request->header('X-User-Id'));
         
-        if ($user && !in_array($user->rol, ['admin', 'inventario'])) {
+        if ($user && !in_array($user->rol, ['super-admin', 'admin', 'inventario'])) {
             return response()->json(['success' => false], 403);
         }
 
@@ -30,8 +30,7 @@ class AlertaStockController extends Controller
         ]);
     }
 
-    // Marcar una alerta como leída (resuelta)
-    public function marcarLeida($id)
+    public function marcarLeida(int $id)
     {
         $alerta = AlertaStock::find($id);
         

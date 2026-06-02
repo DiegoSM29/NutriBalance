@@ -26,7 +26,7 @@ export default function OrdenProduccionPage() {
     const [editModal, setEditModal] = useState({ visible: false, orden: null });
 
     useEffect(() => {
-        if (!usuarioActual || !['admin', 'produccion'].includes(usuarioActual.rol)) {
+        if (!usuarioActual || !['super-admin', 'admin', 'produccion'].includes(usuarioActual.rol)) {
             navigate('/login');
         } else {
             cargarOrdenes();

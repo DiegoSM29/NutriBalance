@@ -3,12 +3,21 @@
 namespace App\Controllers;
 
 use App\Models\Producto;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ProductoController extends Controller
 {
-	// Listar todos los productos para la tabla del administrador
+    private function verificarPermiso(Request $request)
+    {
+        $user = User::find($request->header('X-User-Id'));
+        if (!$user || !in_array($user->rol, ['super-admin', 'admin', 'inventario'])) {
+            return false;
+        }
+        return true;
+    }
+
 	public function index()
 	{
 		return response()->json([
@@ -17,21 +26,21 @@ class ProductoController extends Controller
 		]);
 	}
 
-	// Productos disponibles para ventas
 	public function disponibles()
 	{
-		$productos = Producto::where('stock_actual', '>', 0)
-			->get();
-
+		$productos = Producto::where('stock_actual', '>', 0)->get();
 		return response()->json([
 			'success' => true,
 			'data' => $productos
 		]);
 	}
 
-	// Crear un nuevo producto
 	public function store(Request $request)
 	{
+        if (!$this->verificarPermiso($request)) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
 		$validator = Validator::make($request->all(), [
 			'nombre' => 'required|string|max:30',
 			'categoria' => 'nullable|string|max:40',
@@ -48,7 +57,6 @@ class ProductoController extends Controller
 
 		$data = $request->all();
 
-		// Si viene una imagen, la guardamos en public/productos
 		if ($request->hasFile('imagen')) {
 			$file = $request->file('imagen');
 			$filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
@@ -65,9 +73,12 @@ class ProductoController extends Controller
 		], 201);
 	}
 
-	// Actualizar un producto existente
-	public function update(Request $request, $id)
+	public function update(Request $request, int $id)
 	{
+        if (!$this->verificarPermiso($request)) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
 		$producto = Producto::find($id);
 
 		if (!$producto) {
@@ -77,7 +88,6 @@ class ProductoController extends Controller
 		$data = $request->all();
 
 		if ($request->hasFile('imagen')) {
-			// Borrar la imagen anterior si existe
 			if ($producto->imagen && file_exists(public_path($producto->imagen))) {
 				unlink(public_path($producto->imagen));
 			}
@@ -97,9 +107,12 @@ class ProductoController extends Controller
 		]);
 	}
 
-	// Eliminar un producto
-	public function destroy($id)
+	public function destroy(Request $request, int $id)
 	{
+        if (!$this->verificarPermiso($request)) {
+            return response()->json(['success' => false, 'message' => 'No autorizado.'], 403);
+        }
+
 		$producto = Producto::find($id);
 
 		if (!$producto) {
@@ -113,7 +126,6 @@ class ProductoController extends Controller
 				'message' => 'Producto eliminado correctamente.'
 			]);
 		} catch (\Exception $e) {
-			// Seguridad: Previene que borren un producto que ya alguien compro
 			return response()->json([
 				'success' => false,
 				'message' => 'No se puede eliminar el producto porque ya esta en el historial de un pedido o movimiento.'

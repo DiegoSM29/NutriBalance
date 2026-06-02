@@ -1,4 +1,5 @@
 const roleLabels = {
+    'super-admin': 'Super Administrador',
     admin: 'Administrador',
     ventas: 'Ventas',
     inventario: 'Inventario',
@@ -63,8 +64,13 @@ export default function AdminDashboard({
                                     value={form.password} 
                                     onChange={(e) => setForm({...form, password: e.target.value})} 
                                 />
-                                <button type="button" className="absolute right-3 top-2.5 text-gray-500" onClick={() => setShowPassword(!showPassword)}>
-                                    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                                <button type="button"
+                                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                    title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                    className="absolute right-3 top-2.5 text-gray-500"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true"></i>
                                 </button>
                             </div>
 
@@ -78,6 +84,7 @@ export default function AdminDashboard({
                             />
 
                             <select className="w-full p-2 border rounded text-sm bg-white" value={form.rol} onChange={(e) => setForm({...form, rol: e.target.value})}>
+                                <option value="super-admin">Super Administrador</option>
                                 <option value="admin">Administrador</option>
                                 <option value="ventas">Ventas</option>
                                 <option value="inventario">Inventario</option>
@@ -100,6 +107,7 @@ export default function AdminDashboard({
                                 <input type="text" placeholder="Buscar..." className="p-2 border rounded text-sm w-full sm:w-48" value={busqueda} onChange={(e) => setBuscar(e.target.value)} />
                                 <select className="p-2 border rounded text-sm bg-white" value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)}>
                                     <option value="">Todos los roles</option>
+                                    <option value="super-admin">Super Admin</option>
                                     <option value="admin">Admin</option>
                                     <option value="ventas">Ventas</option>
                                     <option value="inventario">Inventario</option>
@@ -127,12 +135,19 @@ export default function AdminDashboard({
                                                 <div className="font-medium text-gray-800">{u.nombre} {u.apellido}</div>
                                                 <div className="text-gray-500 text-xs">{u.correo}</div>
                                             </td>
-                                            <td className="p-3">
-                                                {u.id_usuario !== adminActual.id_usuario ? (
+                                            <td className="p-3 text-center">
+                                                {/* 1. Si el usuario editado es super-admin bloqueamos el select */}
+                                                {u.rol === 'super-admin' ? (
+                                                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider 
+                                                        bg-gradient-to-r from-yellow-500 via-yellow-600 to-yellow-400
+                                                        text-white shadow-sm border border-yellow-700">
+                                                        Super Administrador
+                                                    </span>
+                                                ) : u.id_usuario !== adminActual.id_usuario ? (
                                                     <select
                                                         value={u.rol}
                                                         onChange={(e) => handleCambiarRol(u, e.target.value)}
-                                                        className="p-1 border rounded text-xs bg-white capitalize"
+                                                        className="p-1 border rounded text-xs bg-white capitalize w-full"
                                                     >
                                                         <option value="admin">Administrador</option>
                                                         <option value="ventas">Ventas</option>
@@ -143,7 +158,9 @@ export default function AdminDashboard({
                                                         <option value="cliente">Cliente</option>
                                                     </select>
                                                 ) : (
-                                                    <span className="capitalize text-sm font-medium text-gray-800">Administrador</span>
+                                                    <span className="capitalize text-sm font-medium text-gray-800">
+                                                        {roleLabels[u.rol] || u.rol}
+                                                    </span>
                                                 )}
                                             </td>
                                             <td className="p-3">
@@ -152,8 +169,8 @@ export default function AdminDashboard({
                                                 </span>
                                             </td>
                                             <td className="p-3 text-center">
-                                                {u.id_usuario !== adminActual.id_usuario && (
-                                                    <button 
+                                                {u.id_usuario !== adminActual.id_usuario && u.rol !== 'super-admin' && (
+                                                    <button
                                                         onClick={() => handleCambiarEstado(u)}
                                                         className={`text-xs px-3 py-1 rounded font-medium transition-colors ${u.estado ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
                                                     >

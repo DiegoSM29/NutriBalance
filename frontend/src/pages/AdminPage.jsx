@@ -23,7 +23,7 @@ export default function AdminPage() {
     });
 
     useEffect(() => {
-        if (!adminActual || adminActual.rol !== 'admin') {
+        if (!adminActual || !['admin', 'super-admin'].includes(adminActual.rol)) {
             navigate('/login');
         } else {
             cargarUsuarios();

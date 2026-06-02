@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import EmpresaPage from './pages/EmpresaPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -17,7 +17,6 @@ import MisVentasPage from './pages/MisVentasPage';
 import OrdenProduccionPage from './pages/OrdenProduccionPage';
 import ProtectedRouteVentas from './components/ProtectedRouteVentas';
 import ReportePage from './pages/ReportePage';
-
 
 function App() {
     return (
@@ -55,6 +54,7 @@ function App() {
                         </ProtectedRouteVentas>
                     }
                 />
+                <Route path="*" element={<Navigate to="/empresa" replace />} />
             </Route>
         </Routes>
     );

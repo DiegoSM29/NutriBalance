@@ -12,7 +12,7 @@ export default function MisVentasPage() {
     const [ventaExpandida, setVentaExpandida] = useState(null);
 
     useEffect(() => {
-        if (!user || user.rol !== 'ventas') {
+        if (!user || !['ventas', 'admin', 'super-admin'].includes(user.rol)) {
             navigate('/login');
         } else {
             cargarVentas();

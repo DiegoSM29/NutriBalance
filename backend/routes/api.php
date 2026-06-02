@@ -13,6 +13,7 @@ use App\Controllers\MisVentaController;
 use App\Controllers\NotificacionController;
 use App\Controllers\OrdenProduccionController;
 use App\Controllers\ReporteController;
+use App\Controllers\RoleController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -63,3 +64,6 @@ Route::put('/ordenes-produccion/{id}', [OrdenProduccionController::class, 'updat
 Route::get('/reportes/ventas', [ReporteController::class, 'ventas']);
 Route::get('/reportes/inventario', [ReporteController::class, 'inventario']);
 Route::get('/reportes/produccion', [ReporteController::class, 'produccion']);
+
+Route::put('/roles/{id}/permisos', [RoleController::class, 'actualizarPermisos']);
+Route::put('/usuarios/{id}/bloquear', [RoleController::class, 'bloquearUsuario']);
