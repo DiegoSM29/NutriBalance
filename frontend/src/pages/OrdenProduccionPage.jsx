@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     getOrdenesProduccion, crearOrdenProduccion, actualizarOrdenProduccion,
@@ -14,7 +14,10 @@ const initialForm = {
 
 export default function OrdenProduccionPage() {
     const navigate = useNavigate();
-    const usuarioActual = JSON.parse(localStorage.getItem('user'));
+    const usuarioActual = useMemo(() => {
+        const raw = localStorage.getItem('user');
+        return raw ? JSON.parse(raw) : null;
+    }, []);
 
     const [ordenes, setOrdenes] = useState([]);
     const [productos, setProductos] = useState([]);
@@ -22,35 +25,35 @@ export default function OrdenProduccionPage() {
     const [loading, setLoading] = useState(false);
     const [filtroEstado, setFiltroEstado] = useState('');
     const [form, setForm] = useState(initialForm);
-    const [editingId, setEditingId] = useState(null);
     const [editModal, setEditModal] = useState({ visible: false, orden: null });
 
-    useEffect(() => {
-        if (!usuarioActual || !['super-admin', 'admin', 'produccion'].includes(usuarioActual.rol)) {
-            navigate('/login');
-        } else {
-            cargarOrdenes();
-            cargarProductos();
-        }
-    }, [filtroEstado]);
-
-    const cargarOrdenes = async () => {
+    const cargarOrdenes = useCallback(async () => {
         try {
             const res = await getOrdenesProduccion(filtroEstado);
             if (res.success) setOrdenes(res.data);
         } catch (error) {
             console.error("Error cargando órdenes", error);
         }
-    };
+    }, [filtroEstado]);
 
-    const cargarProductos = async () => {
+    const cargarProductos = useCallback(async () => {
         try {
             const res = await getAdminProductos();
             if (res.success) setProductos(res.data);
         } catch (error) {
             console.error("Error cargando productos", error);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (!usuarioActual || !['super-admin', 'admin', 'produccion'].includes(usuarioActual.rol)) {
+            navigate('/login');
+        } else {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            cargarOrdenes();
+            cargarProductos();
+        }
+    }, [filtroEstado, usuarioActual, navigate, cargarOrdenes, cargarProductos]);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -141,3 +144,4 @@ export default function OrdenProduccionPage() {
         />
     );
 }
+

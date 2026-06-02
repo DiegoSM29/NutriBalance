@@ -16,14 +16,14 @@ export default function ClientPage() {
         cargarCatalogo();
     }, []);
 
-    const cargarCatalogo = async () => {
+    async function cargarCatalogo() {
         try {
             const res = await getCatalogo();
             if (res.success) setProductos(res.data);
         } catch (error) {
             console.error("Error al cargar el catalogo", error);
         }
-    };
+    }
 
     const agregarAlCarrito = (producto) => {
         setMensaje({ tipo: '', texto: '' });
@@ -133,3 +133,4 @@ export default function ClientPage() {
         />
     );
 }
+

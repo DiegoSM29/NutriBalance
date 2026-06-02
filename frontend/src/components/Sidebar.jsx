@@ -126,3 +126,4 @@ export default function Sidebar({ user, isMobileOpen, onClose }) {
         </aside>
     );
 }
+

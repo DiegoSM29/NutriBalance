@@ -16,21 +16,22 @@ export default function LogisticaPage() {
     const [observacion, setObservacion] = useState('');
     const [modalAbierto, setModalAbierto] = useState(false);
 
-    useEffect(() => {
-        cargarPedidos();
-    }, []);
-
-    const cargarPedidos = async () => {
+    async function cargarPedidos() {
         try {
             setLoading(true);
             const res = await getPedidosLogistica();
             if (res.success) setPedidos(res.data);
         } catch (error) {
-            console.error('Error al cargar pedidos', error);
+            console.error('Error al cargar pedidos de logística', error);
         } finally {
             setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        cargarPedidos();
+    }, []);
 
     const cargarHistorial = async (idPedido) => {
         try {
@@ -83,3 +84,4 @@ export default function LogisticaPage() {
         />
     );
 }
+

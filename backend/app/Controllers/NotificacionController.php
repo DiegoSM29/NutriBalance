@@ -26,7 +26,7 @@ class NotificacionController extends Controller
         ]);
     }
 
-    public function marcarLeida($id)
+    public function marcarLeida(int $id)
     {
         $notificacion = Notificacion::find($id);
 
@@ -71,3 +71,4 @@ class NotificacionController extends Controller
         ]);
     }
 }
+

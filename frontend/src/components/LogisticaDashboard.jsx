@@ -29,8 +29,6 @@ const filtros = [
     { value: 'entregado', label: 'Entregado', icon: 'bi-check2-all' },
 ];
 
-const estadosLogistica = ['confirmado', 'preparacion', 'enviado', 'entregado'];
-
 const siguienteEstado = {
     confirmado: 'preparacion',
     preparacion: 'enviado',
@@ -38,7 +36,6 @@ const siguienteEstado = {
 };
 
 export default function LogisticaDashboard({
-    user,
     pedidos,
     loading,
     filtroEstado,
@@ -289,3 +286,4 @@ export default function LogisticaDashboard({
         </div>
     );
 }
+

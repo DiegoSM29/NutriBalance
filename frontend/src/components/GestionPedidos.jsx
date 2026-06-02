@@ -173,3 +173,4 @@ export default function GestionPedidos({ user, pedidos, loading, onActualizarEst
         </div>
     );
 }
+

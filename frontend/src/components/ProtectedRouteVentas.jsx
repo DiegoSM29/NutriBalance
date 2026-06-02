@@ -12,9 +12,10 @@ export default function ProtectedRouteVentas({ children }) {
     return <Navigate to="/login" />;
   }
 
-  if (!['ventas', 'admin', 'super-admin'].includes(user.rol)) {
+  if (user.rol !== 'ventas') {
     return <Navigate to="/empresa" />;
   }
 
   return children;
 }
+

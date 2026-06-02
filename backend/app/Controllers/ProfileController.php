@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    public function show($id)
+    public function show(int $id)
     {
         $user = User::with('cliente')->find($id);
 
@@ -20,7 +20,7 @@ class ProfileController extends Controller
         return response()->json(['success' => true, 'data' => $user]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         $user = User::find($id);
 
@@ -106,7 +106,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function uploadFoto(Request $request, $id)
+    public function uploadFoto(Request $request, int $id)
     {
         $user = User::find($id);
 
@@ -142,3 +142,4 @@ class ProfileController extends Controller
         ]);
     }
 }
+

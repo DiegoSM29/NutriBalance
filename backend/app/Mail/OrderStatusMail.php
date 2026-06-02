@@ -55,3 +55,4 @@ class OrderStatusMail extends Mailable
         return [];
     }
 }
+

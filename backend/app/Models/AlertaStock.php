@@ -44,3 +44,4 @@ class AlertaStock extends Model
         }
     }
 }
+

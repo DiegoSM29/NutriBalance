@@ -67,3 +67,4 @@ Route::get('/reportes/produccion', [ReporteController::class, 'produccion']);
 
 Route::put('/roles/{id}/permisos', [RoleController::class, 'actualizarPermisos']);
 Route::put('/usuarios/{id}/bloquear', [RoleController::class, 'bloquearUsuario']);
+

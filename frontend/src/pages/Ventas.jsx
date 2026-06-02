@@ -87,7 +87,7 @@ export default function Ventas() {
 
       setProductos(result.data);
 
-    } catch (err) {
+    } catch {
 
       setError('Error cargando productos.');
 
@@ -580,3 +580,4 @@ export default function Ventas() {
     </div>
   );
 }
+

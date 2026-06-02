@@ -148,3 +148,4 @@ export default function MisVentas({ user, ventas, loading, ventaExpandida, setVe
         </div>
     );
 }
+

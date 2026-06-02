@@ -59,9 +59,17 @@ class AdminUserController extends Controller
             });
         }
 
+        // OFUSCACIÓN AÑADIDA: Oculta el rol super-admin si quien consulta es un admin normal
+        $usuarios = $query->get()->map(function($u) use ($admin) {
+            if ($u->hasRole('super-admin') && !$admin->hasRole('super-admin')) {
+                $u->rol = 'admin'; 
+            }
+            return $u;
+        });
+
         return response()->json([
             'success' => true,
-            'data' => $query->get()
+            'data' => $usuarios
         ]);
     }
 
@@ -77,7 +85,7 @@ class AdminUserController extends Controller
             'apellido'  => 'required|string|max:30',
             'correo'    => 'required|email|unique:usuarios,correo',
             'password'  => 'required|string|min:8',
-            'rol'       => 'required|in:admin,ventas,inventario,produccion,logistica,pedidos,cliente'
+            'rol'       => 'required|in:super-admin,admin,ventas,inventario,produccion,logistica,pedidos,cliente'
         ]);
 
         if ($validator->fails()) {
@@ -173,10 +181,19 @@ class AdminUserController extends Controller
             return response()->json(['success' => false, 'message' => 'Usuario no encontrado'], 404);
         }
 
+        // 1. Proteger al Super Admin
         if ($user->hasRole('super-admin') && !$admin->hasRole('super-admin')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Acción denegada: No tienes permisos para modificar al Super Admin.'
+            ], 403);
+        }
+
+        // 2. Proteger a los Administradores entre sí
+        if ($user->hasRole('admin') && !$admin->hasRole('super-admin')) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Acción denegada: Solo el Super Admin puede modificar o deshabilitar a otros Administradores.'
             ], 403);
         }
 

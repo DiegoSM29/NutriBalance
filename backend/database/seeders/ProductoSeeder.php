@@ -49,3 +49,4 @@ class ProductoSeeder extends Seeder
         }
     }
 }
+

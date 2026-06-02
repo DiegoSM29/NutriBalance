@@ -11,7 +11,6 @@ export default function ClienteDashboard({
     totalCarrito,
     agregarAlCarrito,
     modificarCantidad,
-    confirmarPedido,
     showPagoModal,
     comprobante,
     onAbrirModalPago,
@@ -234,3 +233,4 @@ export default function ClienteDashboard({
         </>
     );
 }
+

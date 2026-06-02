@@ -147,3 +147,4 @@ class MovimientoInventarioController extends Controller
         }
     }
 }
+

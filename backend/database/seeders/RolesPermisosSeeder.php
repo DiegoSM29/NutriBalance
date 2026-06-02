@@ -40,3 +40,4 @@ class RolesPermisosSeeder extends Seeder
         $logistica->givePermissionTo(['ver_pedidos', 'actualizar_estado_pedidos']);
     }
 }
+

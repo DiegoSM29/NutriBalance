@@ -18,7 +18,7 @@ class VentaController extends Controller
   {
     $user = User::find($request->id_usuario);
 
-    if (!$user || !in_array($user->rol, ['ventas', 'admin', 'super-admin'])) {
+    if (!$user || $user->rol !== 'ventas') {
 
       return response()->json([
         'success' => false,
@@ -151,3 +151,4 @@ class VentaController extends Controller
     }
   }
 }
+

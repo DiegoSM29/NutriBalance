@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUsuarios, crearUsuario, actualizarUsuario } from '../services/api';
 import AdminDashboard from '../components/AdminDashboard';
 
 export default function AdminPage() {
     const navigate = useNavigate();
-    const adminActual = JSON.parse(localStorage.getItem('user'));
+    const adminActual = useMemo(() => {
+        const raw = localStorage.getItem('user');
+        return raw ? JSON.parse(raw) : null;
+    }, []);
 
     const [usuarios, setUsuarios] = useState([]);
     const [busqueda, setBuscar] = useState('');
@@ -22,22 +25,23 @@ export default function AdminPage() {
         rol: 'ventas' 
     });
 
-    useEffect(() => {
-        if (!adminActual || !['admin', 'super-admin'].includes(adminActual.rol)) {
-            navigate('/login');
-        } else {
-            cargarUsuarios();
-        }
-    }, [busqueda, filtroRol]);
-
-    const cargarUsuarios = async () => {
+    const cargarUsuarios = useCallback(async () => {
         try {
             const res = await getUsuarios({ buscar: busqueda, rol: filtroRol });
             if (res.success) setUsuarios(res.data);
         } catch (error) {
             console.error("Error cargando usuarios", error);
         }
-    };
+    }, [busqueda, filtroRol]);
+
+    useEffect(() => {
+        if (!adminActual || !['admin', 'super-admin'].includes(adminActual.rol)) {
+            navigate('/login');
+        } else {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            cargarUsuarios();
+        }
+    }, [adminActual, cargarUsuarios, navigate]);
 
     const handleCrearEmpleado = async (e) => {
         e.preventDefault();
@@ -76,7 +80,7 @@ export default function AdminPage() {
     const handleCambiarRol = async (usuario, nuevoRol) => {
         if (nuevoRol === usuario.rol) return;
         try {
-            const res = await actualizarUsuario(usuario.id_usuario, { rol: nuevoRol });
+            await actualizarUsuario(usuario.id_usuario, { rol: nuevoRol });
             setMensaje({ tipo: 'success', texto: `Rol cambiado a ${nuevoRol}` });
             cargarUsuarios();
         } catch (err) {
@@ -103,3 +107,4 @@ export default function AdminPage() {
         />
     );
 }
+

@@ -188,7 +188,7 @@ class PedidoController extends Controller
         ]);
     }
 
-    public function historial($id)
+    public function historial(int $id)
     {
         $pedido = Pedido::find($id);
 

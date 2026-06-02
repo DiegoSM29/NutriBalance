@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-const API_URL = 'http://localhost:8000';
-
 const estadoBadge = {
     confirmado: 'bg-blue-100 text-blue-800 border-blue-200',
     preparacion: 'bg-purple-100 text-purple-800 border-purple-200',
@@ -130,7 +128,7 @@ function FacturaImprimible({ pedido, onClose }) {
     );
 }
 
-export default function MisFacturas({ user, pedidos, loading }) {
+export default function MisFacturas({ pedidos, loading }) {
     const [facturaSeleccionada, setFacturaSeleccionada] = useState(null);
 
     const pedidosFactura = pedidos.filter(p =>
@@ -203,3 +201,4 @@ export default function MisFacturas({ user, pedidos, loading }) {
         </div>
     );
 }
+

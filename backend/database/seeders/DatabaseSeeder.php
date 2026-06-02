@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
                 'nombre' => 'SuperAdmin',
                 'apellido' => 'Principal',
                 'password' => Hash::make('admin123'),
-                'rol' => 'super-admin',
+                'rol' => 'admin',
                 'estado' => true
             ]
         );
@@ -57,3 +57,4 @@ class DatabaseSeeder extends Seeder
         }
     }
 }
+
