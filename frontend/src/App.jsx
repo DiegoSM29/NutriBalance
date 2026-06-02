@@ -15,8 +15,8 @@ import DashboardLayout from './components/DashboardLayout';
 import Ventas from './pages/Ventas';
 import MisVentasPage from './pages/MisVentasPage';
 import OrdenProduccionPage from './pages/OrdenProduccionPage';
-import ProtectedRouteVentas from './components/ProtectedRouteVentas';
 import ReportePage from './pages/ReportePage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
 function App() {
@@ -27,34 +27,20 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
 
             <Route element={<DashboardLayout />}>
-                <Route path="/empresa" element={<EmpresaPage />} />
-                <Route path="/perfil" element={<ProfilePage />} />
-                <Route path="/client" element={<ClientPage />} />
-                <Route path="/mis-pedidos" element={<MisPedidosPage />} />
-                <Route path="/mis-facturas" element={<MisFacturasPage />} />
-                <Route path="/pedidos" element={<GestionPedidosPage />} />
-                <Route path="/logistica" element={<LogisticaPage />} />
-                <Route path="/notificaciones" element={<NotificacionesPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/productos" element={<ProductPage />} />
-                <Route path="/produccion" element={<OrdenProduccionPage />} />
-                <Route path="/reportes" element={<ReportePage />} />
-                <Route
-                    path="/mis-ventas"
-                    element={
-                        <ProtectedRouteVentas>
-                            <MisVentasPage />
-                        </ProtectedRouteVentas>
-                    }
-                />
-                <Route
-                    path="/ventas"
-                    element={
-                        <ProtectedRouteVentas>
-                            <Ventas />
-                        </ProtectedRouteVentas>
-                    }
-                />
+                <Route path="/empresa" element={<ProtectedRoute><EmpresaPage /></ProtectedRoute>} />
+                <Route path="/perfil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="/client" element={<ProtectedRoute><ClientPage /></ProtectedRoute>} />
+                <Route path="/mis-pedidos" element={<ProtectedRoute><MisPedidosPage /></ProtectedRoute>} />
+                <Route path="/mis-facturas" element={<ProtectedRoute><MisFacturasPage /></ProtectedRoute>} />
+                <Route path="/pedidos" element={<ProtectedRoute><GestionPedidosPage /></ProtectedRoute>} />
+                <Route path="/logistica" element={<ProtectedRoute><LogisticaPage /></ProtectedRoute>} />
+                <Route path="/notificaciones" element={<ProtectedRoute><NotificacionesPage /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+                <Route path="/productos" element={<ProtectedRoute><ProductPage /></ProtectedRoute>} />
+                <Route path="/produccion" element={<ProtectedRoute><OrdenProduccionPage /></ProtectedRoute>} />
+                <Route path="/reportes" element={<ProtectedRoute><ReportePage /></ProtectedRoute>} />
+                <Route path="/mis-ventas" element={<ProtectedRoute><MisVentasPage /></ProtectedRoute>} />
+                <Route path="/ventas" element={<ProtectedRoute><Ventas /></ProtectedRoute>} />
             </Route>
         </Routes>
     );
