@@ -1,25 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMisVentas } from '../services/api';
 import MisVentas from '../components/MisVentas';
 
 export default function MisVentasPage() {
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = useMemo(() => {
+        const raw = localStorage.getItem('user');
+        return raw ? JSON.parse(raw) : null;
+    }, []);
 
     const [ventas, setVentas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [ventaExpandida, setVentaExpandida] = useState(null);
 
-    useEffect(() => {
-        if (!user || !['ventas', 'admin', 'super-admin'].includes(user.rol)) {
-            navigate('/login');
-        } else {
-            cargarVentas();
-        }
-    }, []);
-
-    const cargarVentas = async () => {
+    const cargarVentas = useCallback(async () => {
         try {
             const res = await getMisVentas();
             if (res.success) setVentas(res.data);
@@ -28,7 +23,16 @@ export default function MisVentasPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (!user || user.rol !== 'ventas') {
+            navigate('/login');
+        } else {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            cargarVentas();
+        }
+    }, [user, navigate, cargarVentas]);
 
     return (
         <MisVentas
@@ -40,3 +44,4 @@ export default function MisVentasPage() {
         />
     );
 }
+

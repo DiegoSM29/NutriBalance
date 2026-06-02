@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPerfil, updatePerfil, uploadFoto } from '../services/api';
 import Profile from '../components/Profile';
@@ -6,7 +6,10 @@ import fondoBg from '../assets/fondo3.jfif';
 
 export default function ProfilePage() {
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = useMemo(() => {
+        const raw = localStorage.getItem('user');
+        return raw ? JSON.parse(raw) : null;
+    }, []);
 
     const [form, setForm] = useState({
         nombre: '',
@@ -32,15 +35,7 @@ export default function ProfilePage() {
     const esCliente = user?.rol === 'cliente';
     const API_URL = 'http://localhost:8000';
 
-    useEffect(() => {
-        if (!user) {
-            navigate('/login');
-            return;
-        }
-        cargarPerfil();
-    }, []);
-
-    async function cargarPerfil() {
+    const cargarPerfil = useCallback(async () => {
         try {
             const res = await getPerfil(user.id_usuario);
             if (res.success) {
@@ -63,7 +58,16 @@ export default function ProfilePage() {
         } catch (err) {
             console.error('Error cargando perfil', err);
         }
-    }
+    }, [user]);
+
+    useEffect(() => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        cargarPerfil();
+    }, [user, navigate, cargarPerfil]);
 
     function handleChange(e) {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -198,3 +202,4 @@ export default function ProfilePage() {
         </div>
     );
 }
+

@@ -37,38 +37,39 @@ export default function ProductPage() {
 
     const usuarioActual = JSON.parse(localStorage.getItem('user'));
 
-    useEffect(() => {
-        cargarProductos();
-        cargarAlertas();
-        cargarMovimientos();
-    }, []);
-
-    const cargarProductos = async () => {
+    async function cargarProductos() {
         try {
             const res = await getAdminProductos();
             if (res.success) setProductos(res.data);
         } catch (error) {
             console.error("Error cargando productos", error);
         }
-    };
+    }
 
-    const cargarAlertas = async () => {
+    async function cargarAlertas() {
         try {
             const res = await getAlertas();
             if (res.success) setAlertas(res.data);
         } catch (error) {
             console.error("Error cargando alertas", error);
         }
-    };
+    }
 
-    const cargarMovimientos = async () => {
+    async function cargarMovimientos() {
         try {
             const res = await getMovimientos();
             if (res.success) setMovimientos(res.data);
         } catch (error) {
             console.error("Error cargando movimientos", error);
         }
-    };
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        cargarProductos();
+        cargarAlertas();
+        cargarMovimientos();
+    }, []);
 
     const handleMarcarLeida = async (id) => {
         try {
@@ -247,3 +248,4 @@ export default function ProductPage() {
         />
     );
 }
+

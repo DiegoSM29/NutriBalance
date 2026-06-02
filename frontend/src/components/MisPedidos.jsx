@@ -18,7 +18,7 @@ const estadoIcon = {
     cancelado: 'bi-x-circle',
 };
 
-export default function MisPedidos({ user, pedidos, loading }) {
+export default function MisPedidos({ pedidos, loading }) {
     return (
         <div className="max-w-5xl mx-auto">
             <div className="mb-8">
@@ -94,3 +94,4 @@ export default function MisPedidos({ user, pedidos, loading }) {
         </div>
     );
 }
+

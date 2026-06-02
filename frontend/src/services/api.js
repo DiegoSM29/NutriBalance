@@ -483,3 +483,4 @@ export async function getReporte(tipo, inicio, fin) {
     if (!response.ok) throw json;
     return json;
 }
+

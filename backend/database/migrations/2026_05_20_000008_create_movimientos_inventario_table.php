@@ -27,3 +27,4 @@ return new class extends Migration
         Schema::dropIfExists('movimientos_inventario');
     }
 };
+

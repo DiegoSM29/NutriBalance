@@ -35,7 +35,7 @@ export default function AdminDashboard({
                     </div>
                     <div className="text-right">
                         <span className="block font-semibold text-emerald-600">{adminActual?.nombre} {adminActual?.apellido}</span>
-                        <span className="text-xs text-gray-400 uppercase tracking-wider">Administrador</span>
+                        <span className="text-xs text-gray-400 uppercase tracking-wider">{roleLabels[adminActual?.rol] || 'Administrador'}</span>
                     </div>
                 </header>
 
@@ -84,8 +84,8 @@ export default function AdminDashboard({
                             />
 
                             <select className="w-full p-2 border rounded text-sm bg-white" value={form.rol} onChange={(e) => setForm({...form, rol: e.target.value})}>
-                                <option value="super-admin">Super Administrador</option>
                                 <option value="admin">Administrador</option>
+                                <option value="super-admin">Super Administrador</option>
                                 <option value="ventas">Ventas</option>
                                 <option value="inventario">Inventario</option>
                                 <option value="produccion">Producción</option>
@@ -123,7 +123,7 @@ export default function AdminDashboard({
                                 <thead>
                                     <tr className="bg-gray-50 text-gray-600 text-sm border-y border-gray-200">
                                         <th className="p-3 font-medium">Usuario</th>
-                                        <th className="p-3 font-medium">Rol</th>
+                                        <th className="p-3 font-medium text-center">Rol</th>
                                         <th className="p-3 font-medium">Estado</th>
                                         <th className="p-3 font-medium text-center">Acción</th>
                                     </tr>
@@ -136,12 +136,13 @@ export default function AdminDashboard({
                                                 <div className="text-gray-500 text-xs">{u.correo}</div>
                                             </td>
                                             <td className="p-3 text-center">
-                                                {/* 1. Si el usuario editado es super-admin bloqueamos el select */}
                                                 {u.rol === 'super-admin' ? (
-                                                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider 
-                                                        bg-gradient-to-r from-yellow-500 via-yellow-600 to-yellow-400
-                                                        text-white shadow-sm border border-yellow-700">
+                                                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-yellow-500 via-yellow-600 to-yellow-400 text-white shadow-sm border border-yellow-700">
                                                         Super Administrador
+                                                    </span>
+                                                ) : (u.rol === 'admin' && adminActual.rol !== 'super-admin') ? (
+                                                    <span className="capitalize text-sm font-medium text-gray-800 bg-gray-100 px-2 py-1 rounded">
+                                                        Administrador
                                                     </span>
                                                 ) : u.id_usuario !== adminActual.id_usuario ? (
                                                     <select
@@ -169,7 +170,9 @@ export default function AdminDashboard({
                                                 </span>
                                             </td>
                                             <td className="p-3 text-center">
-                                                {u.id_usuario !== adminActual.id_usuario && u.rol !== 'super-admin' && (
+                                                {u.id_usuario !== adminActual.id_usuario && 
+                                                 u.rol !== 'super-admin' && 
+                                                 !(u.rol === 'admin' && adminActual.rol !== 'super-admin') && (
                                                     <button
                                                         onClick={() => handleCambiarEstado(u)}
                                                         className={`text-xs px-3 py-1 rounded font-medium transition-colors ${u.estado ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}

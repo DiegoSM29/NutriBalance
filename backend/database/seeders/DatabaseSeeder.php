@@ -12,10 +12,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Instalar Roles y Permisos esenciales de Spatie
         $this->call(RolesPermisosSeeder::class);
 
-        // 2. Crear un único usuario Administrador para acceder al sistema
         $admin = User::firstOrCreate(
             ['correo' => 'superadmin@nutribalance.com'],
             [
@@ -28,7 +26,6 @@ class DatabaseSeeder extends Seeder
         );
         $admin->assignRole('super-admin');
 
-        // 3. Crear un catálogo amplio y variado de productos
         $productos = [
             ['nombre' => 'Proteína Whey 5lbs', 'categoria' => 'Suplementos', 'tipo_producto' => 'Polvo', 'precio_venta' => 450.00, 'stock_actual' => 50, 'stock_minimo' => 10],
             ['nombre' => 'Creatina Monohidratada 300g', 'categoria' => 'Suplementos', 'tipo_producto' => 'Polvo', 'precio_venta' => 150.00, 'stock_actual' => 5, 'stock_minimo' => 15], // Alerta de stock
@@ -52,8 +49,8 @@ class DatabaseSeeder extends Seeder
 
         foreach ($productos as $p) {
             $prod = Producto::create($p);
-            // Ejecutamos la función de alerta para que evalúe si el stock que le asignamos arriba es crítico
             AlertaStock::verificarStock($prod);
         }
     }
 }
+

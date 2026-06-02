@@ -35,3 +35,4 @@ class Pedido extends Model
             ->orderBy('fecha_cambio', 'desc');
     }
 }
+

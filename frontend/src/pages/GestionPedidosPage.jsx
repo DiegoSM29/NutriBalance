@@ -11,11 +11,7 @@ export default function GestionPedidosPage() {
     const [pedidoExpandido, setPedidoExpandido] = useState(null);
     const [filtroEstado, setFiltroEstado] = useState('pendiente');
 
-    useEffect(() => {
-        cargarPedidos();
-    }, []);
-
-    const cargarPedidos = async () => {
+    async function cargarPedidos() {
         try {
             const res = await getTodosPedidos();
             if (res.success) setPedidos(res.data);
@@ -24,7 +20,12 @@ export default function GestionPedidosPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        cargarPedidos();
+    }, []);
 
     const handleActualizarEstado = async (id, estado) => {
         try {
@@ -51,3 +52,4 @@ export default function GestionPedidosPage() {
         />
     );
 }
+

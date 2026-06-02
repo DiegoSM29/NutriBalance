@@ -7,11 +7,7 @@ export default function MisPedidosPage() {
     const [pedidos, setPedidos] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        cargarPedidos();
-    }, []);
-
-    const cargarPedidos = async () => {
+    async function cargarPedidos() {
         try {
             const res = await getMisPedidos();
             if (res.success) setPedidos(res.data);
@@ -20,7 +16,12 @@ export default function MisPedidosPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        cargarPedidos();
+    }, []);
 
     return (
         <MisPedidos
@@ -30,3 +31,4 @@ export default function MisPedidosPage() {
         />
     );
 }
+

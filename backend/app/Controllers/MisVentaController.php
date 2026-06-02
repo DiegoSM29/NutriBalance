@@ -22,3 +22,4 @@ class MisVentaController extends Controller
         ]);
     }
 }
+

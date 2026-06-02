@@ -22,6 +22,7 @@ export default function NotificacionesPage() {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         cargarNotificaciones();
     }, [cargarNotificaciones]);
 
@@ -53,3 +54,4 @@ export default function NotificacionesPage() {
         />
     );
 }
+

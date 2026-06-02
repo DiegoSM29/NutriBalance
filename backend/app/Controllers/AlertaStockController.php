@@ -13,7 +13,7 @@ class AlertaStockController extends Controller
     {
         // Seguridad: Solo permitimos ver esto a admin e inventario
         $user = User::find($request->header('X-User-Id'));
-        
+
         if ($user && !in_array($user->rol, ['super-admin', 'admin', 'inventario'])) {
             return response()->json(['success' => false], 403);
         }
@@ -21,7 +21,7 @@ class AlertaStockController extends Controller
         // Traemos las últimas 50 alertas ordenadas por la más reciente
         $alertas = AlertaStock::with('producto')
             ->orderBy('fecha_alerta', 'desc')
-            ->take(50) 
+            ->take(50)
             ->get();
 
         return response()->json([
@@ -33,7 +33,7 @@ class AlertaStockController extends Controller
     public function marcarLeida(int $id)
     {
         $alerta = AlertaStock::find($id);
-        
+
         if ($alerta) {
             $alerta->leida = true;
             $alerta->save();

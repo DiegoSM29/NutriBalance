@@ -191,3 +191,4 @@ export default function ReporteDashboard({
         </div>
     );
 }
+

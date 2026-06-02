@@ -28,3 +28,4 @@ class DetalleVenta extends Model
         return $this->belongsTo(Venta::class, 'id_venta');
     }
 }
+
