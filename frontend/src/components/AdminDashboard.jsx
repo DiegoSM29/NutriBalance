@@ -1,0 +1,194 @@
+const roleLabels = {
+    'super-admin': 'Super Administrador',
+    admin: 'Administrador',
+    ventas: 'Ventas',
+    inventario: 'Inventario',
+    produccion: 'Producción',
+    logistica: 'Logística',
+    pedidos: 'Pedidos',
+    cliente: 'Cliente',
+};
+
+export default function AdminDashboard({
+    adminActual,
+    usuarios,
+    busqueda,
+    filtroRol,
+    mensaje,
+    form,
+    showPassword,
+    setBuscar,
+    setFiltroRol,
+    setForm,
+    setShowPassword,
+    handleCrearEmpleado,
+    handleCambiarEstado,
+    handleCambiarRol,
+}) {
+    return (
+        <div className="min-h-screen bg-gray-50 p-8">
+            <div className="max-w-7xl mx-auto">
+                <header className="mb-8 flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-800">Panel de Administración</h1>
+                        <p className="text-sm text-gray-500">Gestión de usuarios y roles del sistema.</p>
+                    </div>
+                    <div className="text-right">
+                        <span className="block font-semibold text-emerald-600">{adminActual?.nombre} {adminActual?.apellido}</span>
+                        <span className="text-xs text-gray-400 uppercase tracking-wider">{roleLabels[adminActual?.rol] || 'Administrador'}</span>
+                    </div>
+                </header>
+
+                {mensaje.texto && (
+                    <div className={`mb-6 p-4 rounded-lg text-sm ${mensaje.tipo === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                        {mensaje.texto}
+                    </div>
+                )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    {/* Formulario Crear Empleado */}
+                    <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
+                        <h2 className="text-lg font-semibold mb-4 text-gray-800">Registrar Empleado</h2>
+                        <form onSubmit={handleCrearEmpleado} className="space-y-4">
+                            <input type="text" placeholder="Nombre" required className="w-full p-2 border rounded text-sm" value={form.nombre} onChange={(e) => setForm({...form, nombre: e.target.value})} />
+                            <input type="text" placeholder="Apellido" required className="w-full p-2 border rounded text-sm" value={form.apellido} onChange={(e) => setForm({...form, apellido: e.target.value})} />
+                            <input type="email" placeholder="Correo" required className="w-full p-2 border rounded text-sm" value={form.correo} onChange={(e) => setForm({...form, correo: e.target.value})} />
+                            
+                            <div className="relative">
+                                <input 
+                                    type={showPassword ? "text" : "password"} 
+                                    placeholder="Contraseña" 
+                                    required 
+                                    className="w-full p-2 border rounded text-sm pr-10" 
+                                    value={form.password} 
+                                    onChange={(e) => setForm({...form, password: e.target.value})} 
+                                />
+                                <button type="button"
+                                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                    title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                    className="absolute right-3 top-2.5 text-gray-500"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} aria-hidden="true"></i>
+                                </button>
+                            </div>
+
+                            <input 
+                                type={showPassword ? "text" : "password"} 
+                                placeholder="Confirmar contraseña" 
+                                required 
+                                className="w-full p-2 border rounded text-sm" 
+                                value={form.password_confirmation} 
+                                onChange={(e) => setForm({...form, password_confirmation: e.target.value})} 
+                            />
+
+                            <select className="w-full p-2 border rounded text-sm bg-white" value={form.rol} onChange={(e) => setForm({...form, rol: e.target.value})}>
+                                <option value="admin">Administrador</option>
+                                <option value="super-admin">Super Administrador</option>
+                                <option value="ventas">Ventas</option>
+                                <option value="inventario">Inventario</option>
+                                <option value="produccion">Producción</option>
+                                <option value="logistica">Logística</option>
+                                <option value="pedidos">Pedidos</option>
+                            </select>
+                            
+                            <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded transition-colors text-sm">
+                                Crear Empleado
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Tabla de Usuarios */}
+                    <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+                            <h2 className="text-lg font-semibold text-gray-800">Lista de Usuarios</h2>
+                            <div className="flex gap-2">
+                                <input type="text" placeholder="Buscar..." className="p-2 border rounded text-sm w-full sm:w-48" value={busqueda} onChange={(e) => setBuscar(e.target.value)} />
+                                <select className="p-2 border rounded text-sm bg-white" value={filtroRol} onChange={(e) => setFiltroRol(e.target.value)}>
+                                    <option value="">Todos los roles</option>
+                                    <option value="super-admin">Super Admin</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="ventas">Ventas</option>
+                                    <option value="inventario">Inventario</option>
+                                    <option value="produccion">Producción</option>
+                                    <option value="logistica">Logística</option>
+                                    <option value="pedidos">Pedidos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50 text-gray-600 text-sm border-y border-gray-200">
+                                        <th className="p-3 font-medium">Usuario</th>
+                                        <th className="p-3 font-medium text-center">Rol</th>
+                                        <th className="p-3 font-medium">Estado</th>
+                                        <th className="p-3 font-medium text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {usuarios.map(u => (
+                                        <tr key={u.id_usuario} className="border-b border-gray-100 text-sm hover:bg-gray-50">
+                                            <td className="p-3">
+                                                <div className="font-medium text-gray-800">{u.nombre} {u.apellido}</div>
+                                                <div className="text-gray-500 text-xs">{u.correo}</div>
+                                            </td>
+                                            <td className="p-3 text-center">
+                                                {u.rol === 'super-admin' ? (
+                                                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-yellow-500 via-yellow-600 to-yellow-400 text-white shadow-sm border border-yellow-700">
+                                                        Super Administrador
+                                                    </span>
+                                                ) : (u.rol === 'admin' && adminActual.rol !== 'super-admin') ? (
+                                                    <span className="capitalize text-sm font-medium text-gray-800 bg-gray-100 px-2 py-1 rounded">
+                                                        Administrador
+                                                    </span>
+                                                ) : u.id_usuario !== adminActual.id_usuario ? (
+                                                    <select
+                                                        value={u.rol}
+                                                        onChange={(e) => handleCambiarRol(u, e.target.value)}
+                                                        className="p-1 border rounded text-xs bg-white capitalize w-full"
+                                                    >
+                                                        <option value="admin">Administrador</option>
+                                                        <option value="ventas">Ventas</option>
+                                                        <option value="inventario">Inventario</option>
+                                                        <option value="produccion">Producción</option>
+                                                        <option value="logistica">Logística</option>
+                                                        <option value="pedidos">Pedidos</option>
+                                                        <option value="cliente">Cliente</option>
+                                                    </select>
+                                                ) : (
+                                                    <span className="capitalize text-sm font-medium text-gray-800">
+                                                        {roleLabels[u.rol] || u.rol}
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="p-3">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${u.estado ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                                    {u.estado ? 'Activo' : 'Inactivo'}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-center">
+                                                {u.id_usuario !== adminActual.id_usuario && 
+                                                 u.rol !== 'super-admin' && 
+                                                 !(u.rol === 'admin' && adminActual.rol !== 'super-admin') && (
+                                                    <button
+                                                        onClick={() => handleCambiarEstado(u)}
+                                                        className={`text-xs px-3 py-1 rounded font-medium transition-colors ${u.estado ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                                                    >
+                                                        {u.estado ? 'Deshabilitar' : 'Habilitar'}
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

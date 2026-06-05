@@ -1,0 +1,505 @@
+const API_URL = 'http://localhost:8000/api';
+
+export async function registerCliente(data) {
+    const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) {
+        throw json;
+    }
+    return json;
+}
+
+export async function loginUser(data) {
+    const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+        throw json;
+    }
+
+    return json;
+}
+
+export async function getUsuarios(filtros = {}) {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    const query = new URLSearchParams(filtros).toString();
+    const response = await fetch(`${API_URL}/usuarios?${query}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
+export async function crearUsuario(data) {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    const response = await fetch(`${API_URL}/usuarios`, {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function getPerfil(id) {
+    const response = await fetch(`${API_URL}/perfil/${id}`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function updatePerfil(id, data) {
+    const response = await fetch(`${API_URL}/perfil/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function uploadFoto(id, file) {
+    const formData = new FormData();
+    formData.append('foto', file);
+    const response = await fetch(`${API_URL}/perfil/${id}/foto`, {
+        method: 'POST',
+        body: formData,
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function actualizarUsuario(id, data) {
+
+    const adminActual = JSON.parse(localStorage.getItem('user'));
+    
+    const response = await fetch(`${API_URL}/usuarios/${id}`, {
+        method: 'PUT',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': adminActual.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function getCatalogo() {
+    const response = await fetch(`${API_URL}/catalogo`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function crearPedido(data, comprobante) {
+    const clienteActual = JSON.parse(localStorage.getItem('user'));
+
+    const formData = new FormData();
+    formData.append('productos', JSON.stringify(data.productos));
+    if (comprobante) {
+        formData.append('comprobante', comprobante);
+    }
+    
+    const response = await fetch(`${API_URL}/pedidos`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': clienteActual.id_usuario
+        },
+        body: formData,
+    });
+    
+    const json = await response.json();
+    if (!response.ok) throw json;
+    
+    return json;
+}
+
+export async function getMisPedidos() {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/pedidos/cliente`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user.id_usuario
+        },
+    });
+
+    return response.json();
+}
+
+export async function getTodosPedidos() {
+    const response = await fetch(`${API_URL}/pedidos`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+
+    return response.json();
+}
+
+export async function actualizarEstadoPedido(id, estado, observacion = '') {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const body = { estado };
+    if (observacion) body.observacion = observacion;
+
+    const response = await fetch(`${API_URL}/pedidos/${id}/estado`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario,
+        },
+        body: JSON.stringify(body),
+    });
+
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function getAdminProductos() {
+    const response = await fetch(`${API_URL}/admin/productos`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function crearAdminProducto(formData) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/admin/productos`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: formData,
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function actualizarAdminProducto(id, formData) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    formData.append('_method', 'PUT'); 
+    const response = await fetch(`${API_URL}/admin/productos/${id}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: formData,
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function eliminarAdminProducto(id) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/admin/productos/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function crearCliente(data) {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    const response = await fetch(`${API_URL}/clientes`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function getClientes() {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    const response = await fetch(`${API_URL}/clientes`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
+export async function getProductos() {
+
+    const response = await fetch(`${API_URL}/productos/disponibles`);
+
+    const json = await response.json();
+
+    if (!response.ok) {
+        throw json;
+    }
+
+    return json;
+}
+
+export async function registrarVenta(data) {
+
+    const response = await fetch(`${API_URL}/ventas`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+        throw json;
+    }
+
+    return json;
+}
+
+// MOVIMIENTOS DE INVENTARIO
+export async function getMovimientos() {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/movimientos`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
+export async function registrarEntradaStock(data) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/movimientos/entrada`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function registrarSalidaStock(data) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(`${API_URL}/movimientos/salida`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+// MIS VENTAS (VENDEDOR)
+export async function getMisVentas() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/mis-ventas`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
+export async function getAlertas() {
+    const response = await fetch(`${API_URL}/alertas`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function marcarAlertaLeida(id) {
+    const response = await fetch(`${API_URL}/alertas/${id}/leer`, {
+        method: 'PUT',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function getOrdenesProduccion(estado = '') {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const query = estado ? `?estado=${estado}` : '';
+    const response = await fetch(`${API_URL}/ordenes-produccion${query}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
+export async function crearOrdenProduccion(data) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/ordenes-produccion`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function getOrdenProduccion(id) {
+    const response = await fetch(`${API_URL}/ordenes-produccion/${id}`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function actualizarOrdenProduccion(id, data) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/ordenes-produccion/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+        body: JSON.stringify(data),
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
+export async function getPedidosLogistica() {
+    const response = await fetch(`${API_URL}/pedidos/logistica`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function getHistorialPedido(id) {
+    const response = await fetch(`${API_URL}/pedidos/${id}/historial`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    });
+    return response.json();
+}
+
+export async function getMisNotificaciones() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/notificaciones`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
+export async function marcarNotificacionLeida(id) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/notificaciones/${id}/leer`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
+export async function marcarTodasNotificacionesLeidas() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/notificaciones/leer-todas`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario
+        },
+    });
+    return response.json();
+}
+
+export async function getReporte(tipo, inicio, fin) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const response = await fetch(`${API_URL}/reportes/${tipo}?inicio=${inicio}&fin=${fin}`, {
+        method: 'GET',
+        headers: { 
+            'Accept': 'application/json',
+            'X-User-Id': user?.id_usuario 
+        },
+    });
+    const json = await response.json();
+    if (!response.ok) throw json;
+    return json;
+}
+
